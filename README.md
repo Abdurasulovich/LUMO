@@ -29,4 +29,4 @@ This project is being built using the following technologies:
 * **Architecture:** [e.g., Clean Architecture]
 
 ```bash
-git clone [https://github.com/your-username/lumo-quiz-app.git](https://github.com/your-username/lumo-quiz-app.git)
+git clone https://github.com/Abdurasulovich/LUMO.git
