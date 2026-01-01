@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lummo.Application\Lummo.Application.csproj" />
+    <ProjectReference Include="..\Lummo.Persistence\Lummo.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
