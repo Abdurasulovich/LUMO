@@ -1,0 +1,6 @@
+@Lummo.Server_HostAddress = http://localhost:5188
+
+GET {{Lummo.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
