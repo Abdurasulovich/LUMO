@@ -7,7 +7,6 @@
              xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
              Shell.NavBarIsVisible="False"
              ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
-        <!-- Main content -->
     <ScrollView VerticalScrollBarVisibility="Never">
         <Grid RowDefinitions="*,3*" >
             <Border Grid.RowSpan="2"
