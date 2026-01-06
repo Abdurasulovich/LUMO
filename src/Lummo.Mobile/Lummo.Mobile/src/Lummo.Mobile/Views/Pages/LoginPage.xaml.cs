@@ -9,12 +9,12 @@ public partial class LoginPage : ContentPage
     }
 
     private void InitializeAsync()
-    {
+    { 
     }
 
     private async void EyeButtonClicked(object sender, EventArgs e)
     {
-        if (_isToggling) return; // Agar hali ishlab bo'lmasa, qaytadan ishlatmaslik
+        if (_isToggling) return;
 
         _isToggling = true;
 

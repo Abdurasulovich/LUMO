@@ -8,7 +8,7 @@
     <ContentPage.Behaviors>
         <mct:StatusBarBehavior StatusBarColor="#e4dcfc" StatusBarStyle="DarkContent"/>
     </ContentPage.Behaviors>
-    <ScrollView>
+    <ScrollView VerticalScrollBarVisibility="Never">
         <Grid RowDefinitions="*,3*">
             <Border Grid.RowSpan="2"
                 HeightRequest="260"
@@ -21,8 +21,10 @@
                    HeightRequest="300"/>
             <Border.Background>
                 <LinearGradientBrush EndPoint="0,1">
-                    <GradientStop Color="#e4dcfc" Offset="0"/>
-                    <GradientStop Color="#f5f2fe" Offset="1"/>
+                        <GradientStop Color="{AppThemeBinding Light=#e4dcfc, 
+                            Dark=#231942}" Offset="0"/>
+                    <GradientStop Color="{AppThemeBinding Light=#f5f2fe,
+                        Dark=#2d185a}" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
@@ -30,11 +32,16 @@
             <Border Grid.Row="1"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 40 40 0 0"
-                Background="White"
-                Margin="20,100,20,30"
+                Background="{AppThemeBinding Light=White, Dark=Black}"
+                Margin="20,100,20,0"
                 Padding="0,20">
+                <Border.Shadow>
+                    <Shadow Brush="{AppThemeBinding Light=Gray, Dark=Black}" 
+                            Offset="-1,0"
+                            Opacity="0.5"/>
+                </Border.Shadow>
                 <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto">
-                    <!--#region Welome title-->
+                    <!--#region Welcome title-->
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Label Text="Welcome back!"
                            FontSize="36"
@@ -50,19 +57,21 @@
                     <!--#endregion-->
 
                     <!--#region Email or username and password part-->
-                    <VerticalStackLayout Grid.Row="1" Margin="10,50,10,0" Spacing="25">
+                    <VerticalStackLayout Grid.Row="1" Margin="20,50,20,0" Spacing="25">
 
                         <!--#region Email or username part-->
                         <VerticalStackLayout  Spacing="10">
                             <Label Text="Email or Username"
                            FontFamily="Poppins"
                            FontSize="18"
-                           TextColor="#424f62"
+                           TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                            FontAttributes="Bold"/>
 
-                            <Border StrokeThickness="0"
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
                             StrokeShape="RoundRectangle 25"
-                            Background="#f3f4f6" Padding="20,10,5,10">
+                            Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
+                            Padding="20,10,5,10">
                                 <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="envelope"
                                    HeightRequest="25"
@@ -89,12 +98,14 @@
                             <Label Text="Password"
                             FontFamily="Poppins"
                             FontSize="18"
-                            TextColor="#424f62"
+                            TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                             FontAttributes="Bold"/>
 
-                            <Border StrokeThickness="0"
-                            StrokeShape="RoundRectangle 25"
-                            Background="#f3f4f6" Padding="20,10">
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
+                                    StrokeShape="RoundRectangle 25"
+                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
+                                    Padding="20,10">
                                 <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="lock"
                                 HeightRequest="25"
@@ -147,9 +158,10 @@
                                 Text="Log In"
                                    TextColor="White"
                                    FontFamily="Poppins"
-                                   FontSize="24"
+                                   FontSize="20"
                                    FontAttributes="Bold"
-                                   HorizontalTextAlignment="End"/>
+                                   HorizontalTextAlignment="End"
+                                VerticalTextAlignment="Center"/>
                                 <Image Grid.Column="1"
                                    Source="arrow_right.png"
                                    HeightRequest="25"
@@ -167,14 +179,15 @@
                     <!--#endregion-->
 
                     <!--#region Or continue title part-->
-                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" Margin="10,50,10,0" ColumnSpacing="10">
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" 
+                          Margin="20,50,20,0" ColumnSpacing="10">
                         <BoxView Grid.Column="0"  HeightRequest="0.5"
                              Background="#e2e8f0" VerticalOptions="Center"
                              CornerRadius="10"/>
 
                         <Label Grid.Column="1"
                            Text="Or continue with"
-                           TextColor="#95a3b8"
+                           TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                            FontFamily="Poppins"
                            FontSize="18" 
                            VerticalOptions="Center"/>
@@ -188,18 +201,18 @@
                     <!--#region Google and phone number part-->
                     
                         <Border Grid.Column="0" Grid.Row="3"
-                                Margin="10,30,10,0"
+                                Margin="20,30,20,0"
                             StrokeShape="RoundRectangle 25"
                             Background="Transparent"
                             Padding="20"
-                            Stroke="#e2e8f0">
+                            Stroke="{AppThemeBinding Light=#e2e8f0, Dark=#f3f4f6}">
                             <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
                                 <Image Grid.Column="0" Source="search"
                                    Aspect="AspectFit"
                                    HeightRequest="25"/>
                                 <Label Grid.Column="1" 
                                    Text="Google"
-                                   TextColor="#334155"
+                                   TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                    FontAttributes="Bold"
                                    FontSize="20"
                                    FontFamily="Poppins"
@@ -216,7 +229,7 @@
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span Text="Don't have an account? "
-                                      TextColor="#64748b"
+                                      TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                       FontFamily="Poppins"
                                       FontSize="18"/>
                                 <Span Text="Register"
