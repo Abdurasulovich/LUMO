@@ -7,11 +7,6 @@ public partial class LoginPage : ContentPage
     {
         InitializeComponent();
     }
-
-    private void InitializeAsync()
-    { 
-    }
-
     private async void EyeButtonClicked(object sender, EventArgs e)
     {
         if (_isToggling) return;

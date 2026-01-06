@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using Xe.AcrylicView;
 
 namespace Lummo.Mobile
 {
@@ -12,6 +13,7 @@ namespace Lummo.Mobile
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+                .UseAcrylicView()
                 .UseSkiaSharp()
                 .ConfigureFonts(fonts =>
                 {

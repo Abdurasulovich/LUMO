@@ -9,7 +9,7 @@
              Shell.NavBarIsVisible="False"
              ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
     <ScrollView VerticalScrollBarVisibility="Never">
-        <Grid RowDefinitions="*,3*" >
+        <Grid RowDefinitions="*,3*">
             <Border Grid.RowSpan="2"
                     Grid.Row="0"
                     HeightRequest="300"
@@ -24,10 +24,8 @@
                 </Border.Margin>
                 <Border.Background>
                     <LinearGradientBrush EndPoint="0,1">
-                        <GradientStop Color="{AppThemeBinding Light=#e4dcfc, 
-                            Dark=#231942}" Offset="0"/>
-                        <GradientStop Color="{AppThemeBinding Light=#f5f2fe,
-                        Dark=#2d185a}" Offset="1"/>
+                        <GradientStop Color="{AppThemeBinding Light=#e4dcfc, Dark=#231942}" Offset="0"/>
+                        <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
                     </LinearGradientBrush>
                 </Border.Background>
                 <skia:SKLottieView Source="Welcome.json"
@@ -36,62 +34,66 @@
                                    WidthRequest="300"/>
             </Border>
 
+            <!-- Content border -->
             <Border Grid.Row="1"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 40 40 0 0"
-                Background="{AppThemeBinding Light=White, Dark=Black}"
-                Margin="20,0,20,0">
-                
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 40 40 0 0"
+                    Background="{AppThemeBinding Light=White, Dark=Black}">
+                <Border.Margin>
+                    <OnPlatform x:TypeArguments="Thickness">
+                        <On Platform="iOS" Value="0"/>
+                        <On Platform="Android" Value="20,90,20,0"/>
+                    </OnPlatform>
+                </Border.Margin>
+
                 <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0,20,0,0">
                     <!--#region Welcome title-->
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Label Text="Welcome back!"
-                           FontSize="36"
-                           FontAttributes="Bold"
-                           FontFamily="Poppins"
-                           HorizontalTextAlignment="Center"/>
+                               FontSize="36"
+                               FontAttributes="Bold"
+                               FontFamily="Poppins"
+                               HorizontalTextAlignment="Center"/>
                         <Label Text="Ready to ace your next exam?"
-                           TextColor="#64748b"
-                           HorizontalOptions="Center"
-                           FontSize="18"
-                           FontFamily="Poppins"/>
+                               TextColor="#64748b"
+                               HorizontalOptions="Center"
+                               FontSize="18"
+                               FontFamily="Poppins"/>
                     </VerticalStackLayout>
                     <!--#endregion-->
 
                     <!--#region Email or username and password part-->
                     <VerticalStackLayout Grid.Row="1" Margin="20,50,20,0" Spacing="25">
-
                         <!--#region Email or username part-->
-                        <VerticalStackLayout  Spacing="10">
+                        <VerticalStackLayout Spacing="10">
                             <Label Text="Email or Username"
-                           FontFamily="Poppins"
-                           FontSize="18"
-                           TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
-                           FontAttributes="Bold"
-                           />
+                                   FontFamily="Poppins"
+                                   FontSize="18"
+                                   TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                   FontAttributes="Bold"/>
 
                             <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
-                            StrokeShape="RoundRectangle 25"
-                            Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
-                            Padding="20,10,5,10">
+                                    StrokeShape="RoundRectangle 25"
+                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
+                                    Padding="20,10,5,10">
                                 <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="envelope"
-                                   HeightRequest="25"
-                                   WidthRequest="25"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Center">
+                                           HeightRequest="25"
+                                           WidthRequest="25"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center">
                                         <Image.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </Image.Behaviors>
                                     </Image>
 
                                     <Entry Grid.Column="1"
-                                   Placeholder="student@example.com"
-                                   PlaceholderColor="#97a5ba"
-                                   FontSize="18"
-                                   FontFamily="Poppins"
-                                   Keyboard="Email"/>
+                                           Placeholder="student@example.com"
+                                           PlaceholderColor="#97a5ba"
+                                           FontSize="18"
+                                           FontFamily="Poppins"
+                                           Keyboard="Email"/>
                                 </Grid>
                             </Border>
                         </VerticalStackLayout>
@@ -100,10 +102,10 @@
                         <!--#region Password part-->
                         <VerticalStackLayout Spacing="10">
                             <Label Text="Password"
-                            FontFamily="Poppins"
-                            FontSize="18"
-                            TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
-                            FontAttributes="Bold"/>
+                                   FontFamily="Poppins"
+                                   FontSize="18"
+                                   TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                   FontAttributes="Bold"/>
 
                             <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
@@ -112,67 +114,72 @@
                                     Padding="20,10">
                                 <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="lock"
-                                HeightRequest="25"
-                                WidthRequest="25"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center">
+                                           HeightRequest="25"
+                                           WidthRequest="25"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center">
                                         <Image.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </Image.Behaviors>
                                     </Image>
 
                                     <Entry x:Name="PasswordInput" Grid.Column="1"
-                            Placeholder="••••••••"
-                            PlaceholderColor="#97a5ba"
-                            FontSize="18"
-                            FontFamily="Poppins"
-                            IsPassword="True"/>
+                                           Placeholder="••••••••"
+                                           PlaceholderColor="#97a5ba"
+                                           FontSize="18"
+                                           FontFamily="Poppins"
+                                           IsPassword="True"/>
 
                                     <ImageButton x:Name="EyeButton" Grid.Column="2" Source="eye_crossed"
-                                        HeightRequest="25"
-                                        WidthRequest="25"
-                                        Padding="10"
-                                        VerticalOptions="Center"
-                                        HorizontalOptions="Center"
-                                        Clicked="EyeButtonClicked">
+                                                 HeightRequest="25"
+                                                 WidthRequest="25"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center"
+                                                 Clicked="EyeButtonClicked">
                                         <ImageButton.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </ImageButton.Behaviors>
+                                        <ImageButton.Padding>
+                                            <OnPlatform x:TypeArguments="Thickness">
+                                                <On Platform="iOS" Value="10"/>
+                                                <On Platform="Android" Value="0"/>
+                                            </OnPlatform>
+                                        </ImageButton.Padding>
                                     </ImageButton>
                                 </Grid>
                             </Border>
                             <Label Text="Forgot Password?"
-                               TextColor="#4913ec"
-                               FontFamily="Poppins"
-                               FontAttributes="Bold"
-                               FontSize="18"
-                               HorizontalTextAlignment="End"/>
+                                   TextColor="#4913ec"
+                                   FontFamily="Poppins"
+                                   FontAttributes="Bold"
+                                   FontSize="18"
+                                   HorizontalTextAlignment="End"/>
                         </VerticalStackLayout>
                         <!--#endregion-->
 
                         <!--#region Login button-->
                         <Border Background="#4913ec"
-                            StrokeShape="RoundRectangle 25"
-                            StrokeThickness="0"
-                            Padding="15">
+                                StrokeShape="RoundRectangle 25"
+                                StrokeThickness="0"
+                                Padding="15">
                             <Border.Shadow>
                                 <Shadow Brush="DarkBlue" Offset="0,2" Opacity="0.5"/>
                             </Border.Shadow>
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HorizontalOptions="Center">
                                 <Label Grid.Column="0"
-                                Text="Log In"
-                                   TextColor="White"
-                                   FontFamily="Poppins"
-                                   FontSize="20"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="End"
-                                VerticalTextAlignment="Center"/>
+                                       Text="Log In"
+                                       TextColor="White"
+                                       FontFamily="Poppins"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="End"
+                                       VerticalTextAlignment="Center"/>
                                 <Image Grid.Column="1"
-                                   Source="arrow_right.png"
-                                   HeightRequest="25"
-                                   WidthRequest="25"
-                                   HorizontalOptions="Start"
-                                   VerticalOptions="Center">
+                                       Source="arrow_right.png"
+                                       HeightRequest="25"
+                                       WidthRequest="25"
+                                       HorizontalOptions="Start"
+                                       VerticalOptions="Center">
                                     <Image.Behaviors>
                                         <mct:IconTintColorBehavior TintColor="#ffffff"/>
                                     </Image.Behaviors>
@@ -186,26 +193,26 @@
                     <!--#region Or continue title part-->
                     <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" 
                           Margin="20,50,20,0" ColumnSpacing="10">
-                        <BoxView Grid.Column="0"  HeightRequest="0.5"
-                             Background="#e2e8f0" VerticalOptions="Center"
-                             CornerRadius="10"/>
+                        <BoxView Grid.Column="0" HeightRequest="0.5"
+                                 Background="#e2e8f0" VerticalOptions="Center"
+                                 CornerRadius="10"/>
 
                         <Label Grid.Column="1"
-                           Text="Or continue with"
-                           TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
-                           FontFamily="Poppins"
-                           FontSize="18" 
-                           VerticalOptions="Center"/>
+                               Text="Or continue with"
+                               TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                               FontFamily="Poppins"
+                               FontSize="18" 
+                               VerticalOptions="Center"/>
                         <BoxView Grid.Column="2" HeightRequest="0.5"
-                            Background="#e2e8f0"
-                             VerticalOptions="Center"
-                             CornerRadius="10"/>
+                                 Background="#e2e8f0"
+                                 VerticalOptions="Center"
+                                 CornerRadius="10"/>
                     </Grid>
                     <!--#endregion-->
 
-                    <!--#region Google and phone number part-->
+                    <!--#region Google button-->
                     <Border Grid.Row="3"
-                                Margin="20,30,20,0"
+                            Margin="20,30,20,0"
                             StrokeShape="RoundRectangle 25"
                             Background="Transparent"
                             Padding="20"
@@ -220,8 +227,7 @@
                                    FontAttributes="Bold"
                                    FontSize="20"
                                    FontFamily="Poppins"
-                                       VerticalTextAlignment="Center"/>
-
+                                   VerticalTextAlignment="Center"/>
                         </Grid>
                     </Border>
                     <!--#endregion-->
@@ -245,11 +251,11 @@
                     <!--#endregion-->
 
                     <BoxView Grid.Row="5" 
-                             Background="Red" VerticalOptions="Start">
+                             Background="Transparent" VerticalOptions="Start">
                         <BoxView.HeightRequest>
                             <OnPlatform x:TypeArguments="system:Double">
                                 <On Platform="iOS" Value="0"/>
-                                <On Platform="Android" Value="0"/>
+                                <On Platform="Android" Value="50"/>
                             </OnPlatform>
                         </BoxView.HeightRequest>
                     </BoxView>
