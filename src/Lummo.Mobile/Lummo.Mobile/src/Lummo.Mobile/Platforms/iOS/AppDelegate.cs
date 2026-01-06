@@ -10,19 +10,15 @@ namespace Lummo.Mobile
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            // Configure status bar appearance for iOS
+            // Status bar style'ni sozlash
+            UIApplication.SharedApplication.SetStatusBarStyle(UIStatusBarStyle.LightContent, false);
+            
+            // iOS 13+ uchun
             if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             {
-                // iOS 13+ uses scene-based status bar configuration
-                // The status bar style is controlled by the StatusBarBehavior
+                UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.LightContent;
             }
-            else
-            {
-#pragma warning disable CA1422
-                UIApplication.SharedApplication.StatusBarHidden = false;
-#pragma warning restore CA1422
-            }
-
+            
             return base.FinishedLaunching(application, launchOptions);
         }
     }
