@@ -3,44 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Lummo.Mobile.Views.Pages.LoginPage"
              xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ct="clr-namespace:Lummo.Mobile.Controls"
              xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
-             Shell.NavBarIsVisible="False">
-    <ContentPage.Behaviors>
-        <mct:StatusBarBehavior StatusBarColor="#e4dcfc" StatusBarStyle="DarkContent"/>
-    </ContentPage.Behaviors>
+             Shell.NavBarIsVisible="False"
+             ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
+        <!-- Main content -->
     <ScrollView VerticalScrollBarVisibility="Never">
-        <Grid RowDefinitions="*,3*">
+        <Grid RowDefinitions="*,3*" >
             <Border Grid.RowSpan="2"
-                HeightRequest="260"
-                VerticalOptions="Start"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 0 0 40 40">
-            <skia:SKLottieView Source="Welcome.json"
+                    HeightRequest="280"
+                    VerticalOptions="Start"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 0 0 40 40">
+                <skia:SKLottieView Source="Welcome.json"
                    RepeatCount="-1"
                    WidthRequest="300"
                    HeightRequest="300"/>
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0,1">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0,1">
                         <GradientStop Color="{AppThemeBinding Light=#e4dcfc, 
                             Dark=#231942}" Offset="0"/>
-                    <GradientStop Color="{AppThemeBinding Light=#f5f2fe,
+                        <GradientStop Color="{AppThemeBinding Light=#f5f2fe,
                         Dark=#2d185a}" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
 
             <Border Grid.Row="1"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 40 40 0 0"
                 Background="{AppThemeBinding Light=White, Dark=Black}"
-                Margin="20,100,20,0"
+                Margin="20,90,20,0"
                 Padding="0,20">
-                <Border.Shadow>
-                    <Shadow Brush="{AppThemeBinding Light=Gray, Dark=Black}" 
-                            Offset="-1,0"
-                            Opacity="0.5"/>
-                </Border.Shadow>
-                <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                
+                <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
                     <!--#region Welcome title-->
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Label Text="Welcome back!"
@@ -199,18 +195,18 @@
                     <!--#endregion-->
 
                     <!--#region Google and phone number part-->
-                    
-                        <Border Grid.Column="0" Grid.Row="3"
+
+                    <Border Grid.Column="0" Grid.Row="3"
                                 Margin="20,30,20,0"
                             StrokeShape="RoundRectangle 25"
                             Background="Transparent"
                             Padding="20"
                             Stroke="{AppThemeBinding Light=#e2e8f0, Dark=#f3f4f6}">
-                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
-                                <Image Grid.Column="0" Source="search"
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
+                            <Image Grid.Column="0" Source="search"
                                    Aspect="AspectFit"
                                    HeightRequest="25"/>
-                                <Label Grid.Column="1" 
+                            <Label Grid.Column="1" 
                                    Text="Google"
                                    TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                    FontAttributes="Bold"
@@ -218,12 +214,12 @@
                                    FontFamily="Poppins"
                                        VerticalTextAlignment="Center"/>
 
-                            </Grid>
-                        </Border>
+                        </Grid>
+                    </Border>
 
-                    
+
                     <!--#endregion-->
-                    
+
                     <!--#region No account title part-->
                     <Label Grid.Row="4" HorizontalTextAlignment="Center" Margin="0,30,0,0">
                         <Label.FormattedText>
@@ -241,6 +237,9 @@
                         </Label.FormattedText>
                     </Label>
                     <!--#endregion-->
+
+                    <BoxView HeightRequest="30" Grid.Row="5" 
+                             Background="Transparent" VerticalOptions="Start"/>
                 </Grid>
             </Border>
         </Grid>
