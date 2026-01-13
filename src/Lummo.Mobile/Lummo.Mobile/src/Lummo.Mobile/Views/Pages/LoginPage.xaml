@@ -41,7 +41,7 @@
                     Background="{AppThemeBinding Light=White, Dark=Black}">
                 <Border.Margin>
                     <OnPlatform x:TypeArguments="Thickness">
-                        <On Platform="iOS" Value="0"/>
+                        <On Platform="iOS" Value="20,0,20,0"/>
                         <On Platform="Android" Value="20,90,20,0"/>
                     </OnPlatform>
                 </Border.Margin>

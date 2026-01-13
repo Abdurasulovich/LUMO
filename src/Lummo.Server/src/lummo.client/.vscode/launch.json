@@ -2,18 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "edge",
-      "request": "launch",
-      "name": "localhost (Edge)",
-      "url": "https://localhost:61751",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
+      "name": "https",
       "type": "chrome",
       "request": "launch",
-      "name": "localhost (Chrome)",
-      "url": "https://localhost:61751",
-      "webRoot": "${workspaceFolder}"
+      "url": "D:\\Learning projects\\LUMO\\src\\Lummo.Server\\src\\Lummo.Server\\Lummo.Server.csproj",
+      "webRoot": "D:\\Learning projects\\LUMO\\src\\Lummo.Server\\src\\Lummo.Server\\Lummo.Server.csproj"
     }
-  ]
+  ],
+  "compounds": []
 }
