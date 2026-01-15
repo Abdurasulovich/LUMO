@@ -7,9 +7,9 @@ namespace Lummo.Persistence.Repositories;
 
 public class AccessTokenRepository : IAccessTokenRepository
 {
-    private readonly ICacheBorker _cacheBroker;
+    private readonly ICacheBroker _cacheBroker;
 
-    public AccessTokenRepository(ICacheBorker cacheBroker)
+    public AccessTokenRepository(ICacheBroker cacheBroker)
     {
         _cacheBroker = cacheBroker;
     }
@@ -21,13 +21,16 @@ public class AccessTokenRepository : IAccessTokenRepository
         return accessToken;
     }
 
-    public ValueTask<AccessToken?> GetByIdAsync(Guid accessTokenId, CancellationToken cancellationToken = default)
+    public async ValueTask<AccessToken?> GetByIdAsync(Guid accessTokenId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _cacheBroker.GetAsync<AccessToken>(accessTokenId.ToString(), cancellationToken);
     }
 
-    public ValueTask<AccessToken> UpdateAsync(AccessToken accessToken, CancellationToken cancellationToken = default)
+    public async ValueTask<AccessToken> UpdateAsync(AccessToken accessToken, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var cacheEntryOptions = new CacheEntryOptions(accessToken.ExpiryTime - DateTimeOffset.UtcNow, null);
+        await _cacheBroker.SetAsync(accessToken.Id.ToString(), accessToken, cacheEntryOptions, cancellationToken);
+
+        return accessToken;
     }
 }

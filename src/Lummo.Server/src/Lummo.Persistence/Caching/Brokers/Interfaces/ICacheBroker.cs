@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Lummo.Persistence.Caching.Brokers.Interfaces;
 
-public interface ICacheBorker
+public interface ICacheBroker
 {
     ValueTask<T?> GetAsync<T>(string key,
         CancellationToken cancellationToken = default);
