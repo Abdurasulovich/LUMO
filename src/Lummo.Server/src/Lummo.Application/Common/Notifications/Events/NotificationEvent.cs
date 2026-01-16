@@ -1,4 +1,6 @@
-﻿namespace Lummo.Domain.Common.Events;
+﻿using Lummo.Domain.Common.Events;
+
+namespace Lummo.Application.Common.Notifications.Events;
 
 public class NotificationEvent : Event
 {

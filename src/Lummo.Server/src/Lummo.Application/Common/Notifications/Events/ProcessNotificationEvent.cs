@@ -1,4 +1,5 @@
-﻿using Lummo.Domain.Enums;
+﻿using Lummo.Application.Common.Notifications.Events;
+using Lummo.Domain.Enums;
 
 namespace Lummo.Domain.Common.Events;
 
