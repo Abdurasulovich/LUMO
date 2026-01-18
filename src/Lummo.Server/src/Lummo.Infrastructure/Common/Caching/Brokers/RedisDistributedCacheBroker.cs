@@ -1,8 +1,8 @@
 ﻿using Force.DeepCloner;
 using Lummo.Application.Common.Serializer;
-using Lummo.Domain.Common.Caching;
 using Lummo.Infrastructure.Settings;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
+using Lummo.Persistence.Caching.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Lummo.Infrastructure.Common.Caching.Brokers;
 
-internal class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettings,
+public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettings,
     IDistributedCache distributedCache,
     IJsonSerializationSettingsProvider jsonSerializationSettingsProvider) : ICacheBroker
 {

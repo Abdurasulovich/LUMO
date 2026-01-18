@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Lummo.Application.Common.Identity.Services.Interfaces;
-using Lummo.Domain.Common.Events;
+using Lummo.Application.Common.Notifications.Events;
 using Lummo.Domain.Enums;
 
 namespace Lummo.Infrastructure.Validators;

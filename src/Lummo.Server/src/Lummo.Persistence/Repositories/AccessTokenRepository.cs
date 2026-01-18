@@ -2,6 +2,7 @@
 using Lummo.Domain.Entities;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
 using Lummo.Persistence.Repositories.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Lummo.Persistence.Repositories;
 
@@ -19,6 +20,14 @@ public class AccessTokenRepository : IAccessTokenRepository
         await _cacheBroker.SetAsync(accessToken.Id.ToString(), accessToken, cacheEntryOptions, cancellationToken);
 
         return accessToken;
+    }
+
+    public async ValueTask<AccessToken?> DeleteByIdAsync(Guid accessTokenId, CancellationToken cancellationToken = default)
+    {
+        var foundAccessToken = await _cacheBroker.GetAsync<AccessToken>(accessTokenId.ToString(), cancellationToken);
+        await _cacheBroker.DeleteAsync(accessTokenId.ToString(), cancellationToken);
+
+        return foundAccessToken;
     }
 
     public async ValueTask<AccessToken?> GetByIdAsync(Guid accessTokenId, CancellationToken cancellationToken = default)

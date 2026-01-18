@@ -2,7 +2,8 @@
 
 public enum RoleType
 {
-    System = 0,
-    Admin = 1,
-    User = 2
+    Guest = 0,
+    Host = 1,
+    Admin = 2,
+    System = 3
 }

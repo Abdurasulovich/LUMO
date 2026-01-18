@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Lummo.Domain.Common.Events;
+using Lummo.Application.Common.Notifications.Events;
 
 namespace Lummo.Infrastructure.Validators;
 

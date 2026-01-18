@@ -1,4 +1,4 @@
-﻿using Lummo.Domain.Common.Caching;
+﻿using Lummo.Persistence.Caching.Models;
 using System.ComponentModel;
 
 namespace Lummo.Persistence.Caching.Brokers.Interfaces;

@@ -8,17 +8,15 @@ namespace Lummo.Application.Common.Identity.Services.Interfaces;
 public interface IUserService
 {
     IQueryable<User> Get(Expression<Func<User, bool>>? predicate = default, bool asNoTracking = false);
-
-    ValueTask<IList<User>> GetAsync(QuerySpecification<User> querySpecification,
-        CancellationToken cancellationToken = default);
-
     ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User> GetSystemUserAsync(bool asNoTracking = false,
+    ValueTask<Guid?> GetByEmailAddressAsync(string emailAddress,
+        bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
-    ValueTask<Guid?> GetIdByEmailAddressAsync(string emailAddress,
+    ValueTask<IList<User>> GetByIdsAsync(IEnumerable<Guid> ids,
+        bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
     ValueTask<User> CreateAsync(User user, bool saveChanges = true,
@@ -27,6 +25,10 @@ public interface IUserService
     ValueTask<User> UpdateAsync(User user, bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<string> UploadImageAsync(Guid id, IFormFile imagePath, string webRootPath,
+    ValueTask<User?> DeleteByIdAsync(Guid userId, 
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default);
+    ValueTask<User?> DeleteAsync(User user,
+        bool saveChanges = true,
         CancellationToken cancellationToken = default);
 }

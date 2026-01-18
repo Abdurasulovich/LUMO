@@ -30,7 +30,7 @@ public abstract class EventSubscriber<TEvent> : IEventSubscriber where TEvent : 
     {
         _eventBusSubscriberSettings = eventBusSubscriberSettings.Value;
         _rabbitMqConnectionProvider = rabbitMqConnectionProvider;
-        _queueName = queueName;
+        _queueNames = queueName;
 
         _jsonSerializerSettings = jsonSerializationSettingsProvider.Get(true);
         _jsonSerializerSettings.ContractResolver = new DefaultContractResolver();

@@ -1,16 +1,13 @@
-﻿using Lummo.Domain.Common.Query;
-using Lummo.Domain.Entities;
+﻿using Lummo.Domain.Entities;
 using Lummo.Domain.Enums;
+using System.Linq.Expressions;
 
 namespace Lummo.Application.Common.Notifications.Services.Interfaces;
 
 public interface IEmailTemplateService
 {
-    ValueTask<IList<EmailTemplate>> GetByFilterAsync(
-        FilterPagination filterPagination,
-        bool asNoTracking = false,
-        CancellationToken cancellationToken = default
-        );
+    IQueryable<EmailTemplate> Get(Expression<Func<EmailTemplate, bool>>? predicate = default,
+        bool asNoTracking = false);
 
     ValueTask<EmailTemplate?> GetByTypeAsync(
         NotificationTemplateType templateType,

@@ -1,7 +1,7 @@
-﻿using Lummo.Domain.Common.Caching;
-using Lummo.Domain.Common.Entities.Interfaces;
+﻿using Lummo.Domain.Common.Entities.Interfaces;
 using Lummo.Domain.Common.Query;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
+using Lummo.Persistence.Caching.Models;
 using Lummo.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;

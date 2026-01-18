@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Lummo.Application.Common.Notifications.Events;
 using Lummo.Application.Common.Notifications.Models;
-using Lummo.Domain.Common.Events;
 
 namespace Lummo.Infrastructure.Notifications.Mappers;
 

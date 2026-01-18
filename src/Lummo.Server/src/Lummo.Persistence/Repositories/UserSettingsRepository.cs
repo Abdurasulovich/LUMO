@@ -1,8 +1,8 @@
 using Lummo.Domain.Entities;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
 using Lummo.Persistence.DataContexts;
-using Lummo.Peristence.Repositories.Interfaces;
-    namespace Lummo.Persistence.Repositories;
+using Lummo.Persistence.Repositories.Interfaces;
+namespace Lummo.Persistence.Repositories;
 
     public class UserSettingsRepository(IdentityDbContext dbContext, ICacheBroker cacheBroker)
         : EntityRepositoryBase<UserSettings, IdentityDbContext>(dbContext, cacheBroker), IUserSettingsRepository

@@ -47,4 +47,18 @@ public static class ExceptionExtensions
         }
         return result;
     }
+
+    public static async FuncResult<T> GetValue<T>(this Func<T> func)
+    {
+        FuncResult<T> funcResult;
+        try
+        {
+            funcResult = new FuncResult<T>(func());
+        }catch(Exception ex)
+        {
+            funcResult = new FuncResult<T>(ex);
+        }
+
+        return funcResult;
+    }
 }

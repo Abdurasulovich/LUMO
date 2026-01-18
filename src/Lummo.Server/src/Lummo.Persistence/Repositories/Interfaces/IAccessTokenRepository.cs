@@ -13,4 +13,7 @@ public interface IAccessTokenRepository
 
     ValueTask<AccessToken> UpdateAsync(AccessToken accessToken,
         CancellationToken cancellationToken = default);
+
+    ValueTask<AccessToken?> DeleteByIdAsync(Guid accessTokenId, 
+        CancellationToken cancellationToken = default);
 }

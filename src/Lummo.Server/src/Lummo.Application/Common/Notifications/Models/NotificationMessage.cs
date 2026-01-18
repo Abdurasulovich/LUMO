@@ -2,12 +2,10 @@
 
 namespace Lummo.Application.Common.Notifications.Models;
 
-public class NotificationMessage
+public abstract class NotificationMessage
 {
-    public string Body { get; set; } = default!;
-
-    public NotificationTemplate Template { get; set; } = default!;
-
+    public Guid SenderUserId { get; set; }
+    public Guid ReceiverUserId { get; set; }
     public Dictionary<string, string> Variables { get; set; } = default!;
 
     public bool IsSuccessful { get; set; }

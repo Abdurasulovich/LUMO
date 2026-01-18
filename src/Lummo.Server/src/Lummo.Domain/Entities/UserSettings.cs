@@ -1,10 +1,12 @@
-﻿using Lummo.Domain.Common.Entities.Interfaces;
+﻿using Lummo.Domain.Common.Entities;
 using Lummo.Domain.Enums;
 
 namespace Lummo.Domain.Entities;
 
-public class UserSettings : IEntity
+public class UserSettings : AuditableEntity
 {
-    public Guid Id { get; set ; }
+    public Theme PreferredTheme { get; set; }
     public NotificationType? PreferredNotificationType { get; set ; }
+    public Guid UserId { get; set; }
+    public virtual User? User { get; set; }
 }

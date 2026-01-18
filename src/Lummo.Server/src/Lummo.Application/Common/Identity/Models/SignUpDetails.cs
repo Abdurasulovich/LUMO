@@ -5,12 +5,11 @@ public class SignUpDetails
     public string FirstName { get; set; } = default!;
 
     public string LastName { get; set; } = default!;
+    public int Age { get; set; }
 
     public string EmailAddress { get; set; } = default!;
 
     public string? Password { get; set; }
-
-    public DateTime BirthDate { get; set; }
 
     public bool AutoGeneratePassword { get; set; }
 }

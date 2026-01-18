@@ -6,7 +6,6 @@ using Lummo.Application.Common.Notifications.Events;
 using Lummo.Application.Common.Notifications.Models;
 using Lummo.Application.Common.Notifications.Services.Interfaces;
 using Lummo.Application.Common.Serializer;
-using Lummo.Domain.Common.Events;
 using Lummo.Domain.Common.Query;
 using Lummo.Domain.Constants;
 using Lummo.Domain.Entities;
