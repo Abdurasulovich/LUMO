@@ -1,12 +1,10 @@
-﻿using Lummo.Domain.Common.Entities.Interfaces;
+﻿using Lummo.Domain.Common.Entities;
 using Lummo.Domain.Enums;
 
 namespace Lummo.Domain.Entities;
 
-public abstract class NotificationHistory : IEntity
+public abstract class NotificationHistory : AuditableEntity
 {
-    public Guid Id { get; set; }
-
     public Guid TemplateId { get; set; }
 
     public Guid SenderUserId { get; set; }
@@ -20,5 +18,5 @@ public abstract class NotificationHistory : IEntity
 
     public string? ErrorMessage { get; set; }
 
-    public NotificationTemplate Template { get; set; }
+    public NotificationTemplate? Template { get; set; }
 }

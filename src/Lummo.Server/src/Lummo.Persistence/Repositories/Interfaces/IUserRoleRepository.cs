@@ -8,7 +8,7 @@ public interface IUserRoleRepository
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<UserRole?> DeleteAsync(UserRole userRole,
+    ValueTask<bool> DeleteAsync(UserRole userRole,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 }

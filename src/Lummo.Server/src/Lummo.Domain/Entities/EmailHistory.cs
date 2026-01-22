@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.ComponentModel.DataAnnotations.Schema;
-using Type = Lummo.Domain.Enums.NotificationType;
+﻿using Type = Lummo.Domain.Enums.NotificationType;
 namespace Lummo.Domain.Entities;
 
 public class EmailHistory : NotificationHistory
@@ -16,10 +14,5 @@ public class EmailHistory : NotificationHistory
 
     public string Subject { get; set; } = default!;
 
-    [NotMapped]
-    public EmailTemplate EmailTemplate
-    {
-        get => Template is not null ? Template as EmailTemplate : null;
-        set => Template = value;
-    }
+    public EmailTemplate Template { get; set; }
 }

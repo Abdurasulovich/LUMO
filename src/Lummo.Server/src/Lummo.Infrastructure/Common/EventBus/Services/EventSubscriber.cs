@@ -1,15 +1,13 @@
 ﻿using Lummo.Application.Common.EventBus.Brokers.Interfaces;
 using Lummo.Application.Common.Serializer;
-using Lummo.Domain.Common.EventBus.Brokers.Interfaces;
-using Lummo.Domain.Common.Events;
-using Lummo.Infrastructure.Settings;
+using Lummo.Domain.Events;
+using Lummo.Infrastructure.Common.Settings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
-using System.Threading.Channels;
 
 namespace Lummo.Infrastructure.Common.EventBus.Services;
 
@@ -52,7 +50,7 @@ public abstract class EventSubscriber<TEvent> : IEventSubscriber where TEvent : 
     protected virtual async ValueTask SetChannelAsync()
     {
         Channel = await _rabbitMqConnectionProvider.CreateChannelAsync();
-        await Channel.BasicQosAsync(0, _eventBusSubscriberSettings.PerfetchCount, false);
+        await Channel.BasicQosAsync(0, _eventBusSubscriberSettings.PrefetchCount, false);
     }
 
     protected virtual async ValueTask SetConsumerAsync(CancellationToken cancellationToken = default)
@@ -79,7 +77,7 @@ public abstract class EventSubscriber<TEvent> : IEventSubscriber where TEvent : 
         try
         {
             var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-            var @event = JsonConvert.DeserializeObject<TEvent>(message, _jsonSerializerSettings)!;
+            var @event = (TEvent)JsonConvert.DeserializeObject(message, typeof(TEvent), _jsonSerializerSettings)!;
             @event.Redelivered = ea.Redelivered;
 
             var result = await ProcessAsync(@event, cancellationToken);

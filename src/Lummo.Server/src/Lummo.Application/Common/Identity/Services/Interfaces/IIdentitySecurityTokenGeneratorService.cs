@@ -6,12 +6,12 @@ namespace Lummo.Application.Common.Identity.Services.Interfaces;
 
 public interface IIdentitySecurityTokenGeneratorService
 {
-    AccessToken GenerateAccessTokenAsync(User user);
+    AccessToken GenerateAccessToken(User user);
 
     RefreshToken GenerateRefreshTokenAsync(User user,
         bool extendedExpiryTime = false);
 
-    (AccessToken accessToken, bool IsExpired)? GetAccessToken(string tokenValue);
+    (AccessToken AccessToken, bool IsExpired)? GetAccessToken(string tokenValue);
 
     Guid GetAccessTokenId(string accessToken);
 

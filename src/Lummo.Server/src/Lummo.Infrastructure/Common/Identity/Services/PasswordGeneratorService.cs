@@ -3,7 +3,7 @@ using Lummo.Application.Common.Identity.Models;
 using Lummo.Application.Common.Identity.Services.Interfaces;
 using Lummo.Domain.Entities;
 using Lummo.Domain.Extensions;
-using Lummo.Infrastructure.Settings;
+using Lummo.Infrastructure.Common.Settings;
 using Microsoft.Extensions.Options;
 using System.Collections.Immutable;
 using System.Text;

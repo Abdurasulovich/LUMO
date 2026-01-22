@@ -1,6 +1,6 @@
 ﻿using Force.DeepCloner;
 using Lummo.Application.Common.Serializer;
-using Lummo.Infrastructure.Settings;
+using Lummo.Infrastructure.Common.Settings;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
 using Lummo.Persistence.Caching.Models;
 using Microsoft.Extensions.Caching.Distributed;
@@ -10,9 +10,11 @@ using System.Text;
 
 namespace Lummo.Infrastructure.Common.Caching.Brokers;
 
-public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettings,
+public class RedisDistributedCacheBroker(
+    IOptions<CacheSettings> cacheSettings,
     IDistributedCache distributedCache,
-    IJsonSerializationSettingsProvider jsonSerializationSettingsProvider) : ICacheBroker
+    IJsonSerializationSettingsProvider jsonSerializationSettingsProvider
+    ) : ICacheBroker
 {
 
     private readonly DistributedCacheEntryOptions _entryOption = new()
@@ -21,16 +23,12 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettings,
         SlidingExpiration = TimeSpan.FromSeconds(cacheSettings.Value.SlidingExpirationInSeconds)
     };
 
-    private readonly JsonSerializerSettings _jsonSettings = new()
-    {
-        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-    };
-
     public async ValueTask SetAsync<T>(string key, T value, CacheEntryOptions? cacheEntryOptions = null, CancellationToken cancellationToken = default)
     {
         await distributedCache.SetStringAsync(
             key,
             JsonConvert.SerializeObject(value, jsonSerializationSettingsProvider.Get()),
+            GetCacheEntryOptions(cacheEntryOptions),
             cancellationToken
             );
     }
@@ -83,12 +81,9 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettings,
 
         var currentEntryOptions = _entryOption.DeepClone();
 
-        currentEntryOptions.AbsoluteExpirationRelativeToNow = _entryOption.AbsoluteExpirationRelativeToNow.HasValue
-            ? currentEntryOptions.AbsoluteExpirationRelativeToNow
-            : null;
-        currentEntryOptions.SlidingExpiration = _entryOption.SlidingExpiration.HasValue
-            ? currentEntryOptions.SlidingExpiration
-            : null;
+        currentEntryOptions.AbsoluteExpirationRelativeToNow = cacheEntryOptions.AbsoluteExpirationRelativeNow;
+
+        currentEntryOptions.SlidingExpiration = cacheEntryOptions.SlidingExpiration;
 
         return currentEntryOptions;
     }

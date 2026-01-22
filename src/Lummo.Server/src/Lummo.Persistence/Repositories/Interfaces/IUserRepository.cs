@@ -22,11 +22,11 @@ public interface IUserRepository
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User?> DeleteAsync(User user,
+    ValueTask<bool> DeleteAsync(User user,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User?> DeleteByIdAsync(Guid userId,
+    ValueTask<bool> DeleteByIdAsync(Guid userId,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 }

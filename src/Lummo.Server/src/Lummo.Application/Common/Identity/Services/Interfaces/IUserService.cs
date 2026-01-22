@@ -11,7 +11,7 @@ public interface IUserService
     ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
-    ValueTask<Guid?> GetByEmailAddressAsync(string emailAddress,
+    ValueTask<User?> GetByEmailAddressAsync(string emailAddress,
         bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
@@ -25,10 +25,10 @@ public interface IUserService
     ValueTask<User> UpdateAsync(User user, bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User?> DeleteByIdAsync(Guid userId, 
+    ValueTask<bool> DeleteByIdAsync(Guid userId, 
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
-    ValueTask<User?> DeleteAsync(User user,
+    ValueTask<bool> DeleteAsync(User user,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 }

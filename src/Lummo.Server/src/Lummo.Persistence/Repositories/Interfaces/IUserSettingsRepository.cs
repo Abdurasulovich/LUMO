@@ -22,10 +22,10 @@ public interface IUserSettingsRepository
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 
-    ValueTask<UserSettings?> DeleteAsync(UserSettings userSettings,
+    ValueTask<bool> DeleteAsync(UserSettings userSettings,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
-    ValueTask<UserSettings?> DeleteByIdAsync(Guid userSettingsId,
+    ValueTask<bool> DeleteByIdAsync(Guid userSettingsId,
         bool saveChanges = true,
         CancellationToken cancellationToken = default);
 }

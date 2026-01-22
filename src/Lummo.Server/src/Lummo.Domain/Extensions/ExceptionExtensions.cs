@@ -48,7 +48,7 @@ public static class ExceptionExtensions
         return result;
     }
 
-    public static async FuncResult<T> GetValue<T>(this Func<T> func)
+    public static FuncResult<T> GetValue<T>(this Func<T> func)
     {
         FuncResult<T> funcResult;
         try

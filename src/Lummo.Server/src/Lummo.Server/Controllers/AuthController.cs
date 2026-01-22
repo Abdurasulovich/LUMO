@@ -1,66 +1,55 @@
-﻿using Lummo.Domain.Entities;
-using Lummo.Server.Dtos;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Lummo.Application.Common.Identity.Models;
+using Lummo.Application.Common.Identity.Services.Interfaces;
+using Lummo.Domain.Brokers;
+using Lummo.Server.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Lummo.Server.Controllers;
 
-public class AuthController(IConfiguration configuration) : Controller
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController(
+    IMapper mapper,
+    IAuthService authService,
+    IRequestUserContextProvider requestuserContextProvider) : ControllerBase
 {
-    private static User user = new();
-    [HttpPost("register")]
-    public ActionResult<User> Register(UserDto request)
+    [HttpPost("sign-up")]
+    public async Task<IActionResult> SignUp([FromBody] SignUpDetails signUpDetails, CancellationToken cancellationToken)
     {
-        var hashedPassword = new PasswordHasher<User>()
-            .HashPassword(user, request.Password);
-
-        user.FirstName = request.UserName;
-        user.PasswordHash = hashedPassword;
-
-        return Ok(user);
+        var result = await authService.SignUpAsync(signUpDetails, cancellationToken);
+        return result ? Ok(result) : BadRequest();
     }
 
-    [HttpPost("login")]
-    public ActionResult<string> Login(UserDto request)
+    [HttpPost("sign-in")]
+    public async Task<IActionResult> SignIn([FromBody] SignInDetails signInDetails, CancellationToken cancellationToken)
     {
-        if (user.FirstName != request.UserName)
-        {
-            return BadRequest("User not found");
-        }
-        if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password)
-            == PasswordVerificationResult.Failed)
-        {
-            return BadRequest("Wrong password.");
-        }
+        var result = await authService.SignInAsync(signInDetails, cancellationToken);
 
-        string token = CreateToken(user);
-        return Ok(token);
+        return Ok(mapper.Map<IdentityTokenDto>(result));
     }
 
-    private string CreateToken(User user)
+    [HttpPut("refresh-token")]
+    public async ValueTask<IActionResult> RefreshToken([FromBody] string refreshTokenValue, CancellationToken cancellationToken)
     {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.FirstName)
-        };
+        var result = await authService.RefreshTokenAsync(refreshTokenValue, cancellationToken);
+        return Ok(mapper.Map<AccessTokenDto>(result));
+    }
+    
+    [Authorize(Roles = "Admin, System")]
+    [HttpPost("users/{userId:guid}/roles/{roleType}")]
+    public async Task<IActionResult> GrandRole([FromRoute] Guid userId, [FromRoute] string roleType, CancellationToken cancellationToken)
+    {
+        var result = await authService.GrandRoleAsync(userId, roleType, cancellationToken);
+        return result ? Ok(result) : NoContent();
+    }
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-
-        var tokenDescriptor = new JwtSecurityToken(
-            issuer: configuration.GetValue<string>("AppSettings:Issuer"),
-            audience: configuration.GetValue<string>("AppSettings:Audience"),
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(1),
-            signingCredentials: creds
-            );
-
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+    [Authorize(Roles = "Admin, System")]
+    [HttpDelete("users/{userId:guid}/roles/{roleType}")]
+    public async Task<IActionResult> RevokeRole([FromRoute] Guid userId, [FromRoute] string roleType, CancellationToken cancellationToken)
+    {
+        var result = await authService.RevokeRoleAsync(userId, roleType, cancellationToken);
+        return result ? Ok(result) : NoContent();
     }
 }

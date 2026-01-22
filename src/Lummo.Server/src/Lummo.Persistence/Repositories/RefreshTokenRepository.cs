@@ -1,6 +1,6 @@
-﻿using Lummo.Domain.Common.Caching;
-using Lummo.Domain.Entities;
+﻿using Lummo.Domain.Entities;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
+using Lummo.Persistence.Caching.Models;
 using Lummo.Persistence.Repositories.Interfaces;
 
 namespace Lummo.Persistence.Repositories;

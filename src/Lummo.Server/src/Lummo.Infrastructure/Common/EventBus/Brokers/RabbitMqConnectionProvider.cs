@@ -1,5 +1,5 @@
 ﻿using Lummo.Application.Common.EventBus.Brokers.Interfaces;
-using Lummo.Infrastructure.Settings;
+using Lummo.Infrastructure.Common.Settings;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 

@@ -1,32 +1,39 @@
-﻿using Lummo.Application.Common.Serializer;
-using Lummo.Application.Common.Services.Interfaces;
+﻿using FluentValidation;
+using Lummo.Application.Common.EventBus.Brokers.Interfaces;
+using Lummo.Application.Common.Identity.Services.Interfaces;
+using Lummo.Application.Common.Notifications.Brokers.Interfaces;
+using Lummo.Application.Common.Notifications.Services.Interfaces;
+using Lummo.Application.Common.Serializer;
+using Lummo.Application.Common.Settings;
+using Lummo.Application.Common.StorageFiles;
+using Lummo.Application.Common.Verifications.Services.Interfaces;
+using Lummo.Domain.Brokers;
 using Lummo.Infrastructure.Common.Caching.Brokers;
+using Lummo.Infrastructure.Common.EventBus.Brokers;
+using Lummo.Infrastructure.Common.EventBus.Services;
+using Lummo.Infrastructure.Common.Identity.Services;
+using Lummo.Infrastructure.Common.Notifications.Brokers;
+using Lummo.Infrastructure.Common.Notifications.Services;
+using Lummo.Infrastructure.Common.RequestContexts;
 using Lummo.Infrastructure.Common.Serializer;
-using Lummo.Infrastructure.Services;
-using Lummo.Infrastructure.Settings;
+using Lummo.Infrastructure.Common.Settings;
+using Lummo.Infrastructure.Common.StorageFiles;
+using Lummo.Infrastructure.Common.Verifications.Services;
+using Lummo.Infrastructure.StorageFiles.Settings;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
 using Lummo.Persistence.DataContexts;
+using Lummo.Persistence.Interceptors;
+using Lummo.Persistence.Repositories;
+using Lummo.Persistence.Repositories.Interfaces;
+using Lummo.Server.Data;
+using Lummo.Server.Formatters;
 using Lummo.Server.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Reflection;
 using System.Text;
-using Lummo.Application.Common.EventBus.Brokers.Interfaces;
-using Lummo.Infrastructure.Common.EventBus.Brokers;
-using Lummo.Infrastructure.Common.EventBus.Services;
-using FluentValidation;
-using System.Runtime.CompilerServices;
-using Lummo.Persistence.Repositories.Interfaces;
-using Lummo.Persistence.Repositories;
-using Lummo.Application.Common.Notifications.Services.Interfaces;
-using Lummo.Infrastructure.Notifications.Services;
-using Lummo.Application.Common.Notifications.Brokers.Interfaces;
-using Lummo.Infrastructure.Notifications.Brokers;
-using Lummo.Application.Common.Identity.Services.Interfaces;
-using Lummo.Infrastructure.Common.Identity.Services;
 
 namespace Lummo.Server.Configurations;
 
@@ -58,12 +65,6 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    private static WebApplicationBuilder AddMapping(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddAutoMapper(Assemblies);
-        return builder;
-    }
-
     private static WebApplicationBuilder AddCaching(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection(nameof(CacheSettings)));
@@ -92,7 +93,7 @@ public static partial class HostConfiguration
                     ValidateAudience = jwtSettings.ValidateAudience,
                     ValidateLifetime = jwtSettings.ValidateLifetime,
                     ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secretkey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
                 };
             });
 
@@ -162,21 +163,159 @@ public static partial class HostConfiguration
         builder.Services
             .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<IUserSettingsRepository, UserSettingsRepository>()
+            .AddScoped<IRoleRepository, RoleRepository>()
+            .AddScoped<IUserRoleRepository, UserRoleRepository>()
             .AddScoped<IAccessTokenRepository, AccessTokenRepository>()
             .AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         builder.Services
             .AddScoped<IUserService, UserService>()
             .AddScoped<IUserSettingsService, UserSettingsService>()
+            .AddScoped<IRoleService, RoleService>()
+            .AddScoped<IAccountService, AccountService>()
+            .AddScoped<IAuthService, AuthService>()
+            .AddScoped<IIdentitySecurityTokenGeneratorService, IdentitySecurityTokenGeneratorService>()
             .AddScoped<IIdentitySecurityTokenService, IdentitySecurityTokenService>()
             .AddScoped<IPasswordGeneratorService, PasswordGeneratorService>()
-            .AddScoped<IPasswordHasherService, PasswordHasherService>();
+            .AddScoped<IPasswordHasherService, PasswordHasherService>()
+            .AddScoped<IRoleProcessingService, RoleProcessingService>();
 
         return builder;
     }
 
-    //private static WebApplicationBuilder AddStorageFileInfrastructure(this WebApplicationBuilder builder)
-    //{
-    //    builder.Services.Configure<StorageFileSettings>
-    //}
+    private static WebApplicationBuilder AddStorageFileInfrastructure(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<StorageFileSettings>(builder.Configuration.GetSection(nameof(StorageFileSettings)));
+
+        builder.Services
+            .AddScoped<IStorageFileRepository, StorageFileRepository>()
+            .AddScoped<IStorageFileService, StorageFileService>();
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddVerificationInfrastructure(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<VerificationCodeSettings>(
+            builder.Configuration.GetSection(nameof(VerificationCodeSettings)));
+
+        builder.Services.AddScoped<IUserInfoVerificationCodeRepository, UserInfoVerificationCodeRepository>();
+        builder.Services.AddScoped<IUserInfoVerificationCodeService, UserInfoVerificationCodeService>();
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddRequestContextTools(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddScoped<IRequestUserContextProvider, RequestUserContextProvider>();
+
+        builder.Services.Configure<RequestUserContextSettings>(
+            builder.Configuration.GetSection(nameof(RequestUserContextSettings)));
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddPersistence(this  WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddScoped<UpdatePrimaryKeyInterceptor>()
+            .AddScoped<UpdateAuditableInterceptor>()
+            .AddScoped<UpdateSoftDeletionInterceptor>();
+
+        builder.Services.AddDbContext<AppDbContext>((provider, options) =>
+        {
+            options
+            .UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString"))
+            .AddInterceptors(provider.GetRequiredService<UpdatePrimaryKeyInterceptor>(),
+            provider.GetRequiredService<UpdateAuditableInterceptor>(),
+            provider.GetRequiredService<UpdateSoftDeletionInterceptor>());
+        });
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddExposers(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddRouting(options => options.LowercaseUrls = true);
+        builder.Services.AddControllers(
+            options =>
+            {
+                options.InputFormatters.Add(new TextInputFormatter());
+            }
+        );
+
+        builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(nameof(ApiSettings)));
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options => options.AddPolicy("AllowSpecificOrigin",
+            policy => policy
+            .WithOrigins(builder.Configuration["ApiClientSettings:WebClientAddress"]!)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()));
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddDevTools(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        return builder;
+    }
+
+
+    private static async ValueTask<WebApplication> MigrateDatabaseSchemasAsync(this WebApplication app)
+    {
+        var serviceScopeFactory = app.Services.GetRequiredKeyedService<IServiceScopeFactory>(null);
+
+        await serviceScopeFactory.MigrateAsync<AppDbContext>();
+
+        return app;
+    }
+
+    private static async ValueTask<WebApplication> SeedDataAsync(this WebApplication app)
+    {
+        var serviceScope = app.Services.CreateScope();
+        await serviceScope.ServiceProvider.InitializeSeedAsync();
+
+        return app;
+    }
+    private static WebApplication UseCors(this WebApplication app)
+    {
+        app.UseCors("AllowSpecificOrigin");
+
+        return app;
+    }
+
+    private static WebApplication UseIdentityInfrastructure(this WebApplication app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseMiddleware<AccessTokenValidationMiddleware>();
+
+        return app;
+    }
+
+    private static WebApplication UseExposers(this WebApplication app)
+    {
+        app.MapControllers();
+
+        return app;
+    }
+
+    private static WebApplication UseDevTools(this WebApplication app)
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+
+        return app;
+    }
 }

@@ -1,12 +1,9 @@
 ﻿using Lummo.Domain.Common.Entities.Interfaces;
-using Lummo.Domain.Common.Query;
 using Lummo.Persistence.Caching.Brokers.Interfaces;
 using Lummo.Persistence.Caching.Models;
 using Lummo.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices;
 
 namespace Lummo.Persistence.Repositories;
 
@@ -20,7 +17,7 @@ public class EntityRepositoryBase<TEntity, TContext>(
 
     protected IQueryable<TEntity> Get(
         Expression<Func<TEntity, bool>>? predicate = default,
-        bool asNoTracking = default)
+        bool asNoTracking = false)
     {
         var initialQuery = DbContext.Set<TEntity>().Where(entity => true);
         if(predicate is not null)
@@ -32,32 +29,6 @@ public class EntityRepositoryBase<TEntity, TContext>(
         return initialQuery;
     }
 
-    protected async ValueTask<IList<TEntity>> GetAsync(
-        QuerySpecification<TEntity> querySpecification,
-        CancellationToken cancellationToken = default)
-    {
-        var foundEntities = new List<TEntity>();
-        var cacheKey = querySpecification.CacheKey;
-
-        if(cacheEntryOptions is null || !await cacheBroker.TryGetAsync<List<TEntity>>(cacheKey, out var cacheEntities))
-        {
-            var initialQuery = DbContext.Set<TEntity>().AsQueryable();
-
-            if (querySpecification.AsNoTracking)
-                initialQuery = initialQuery.AsNoTracking();
-
-            initialQuery = initialQuery.ApplySpecification(querySpecification);
-
-            foundEntities = await initialQuery.ToListAsync(cancellationToken);
-
-            if (cacheEntryOptions is not null)
-                await cacheBroker.SetAsync(cacheKey, foundEntities, cacheEntryOptions, cancellationToken);
-        }else if(cacheEntities is not null)
-            foundEntities = cacheEntities;
-        
-        return foundEntities;
-    }
-
     protected async ValueTask<TEntity?> GetByIdAsync(
         Guid id,
         bool asNoTracking = false,
@@ -66,7 +37,7 @@ public class EntityRepositoryBase<TEntity, TContext>(
     {
         var foundEntity = default(TEntity?);
 
-        if (cacheEntryOptions is null || !await cacheBroker.TryGetAsync<TEntity>(id.ToString(), out var cachedEntity))
+        if (cacheEntryOptions is null || !await cacheBroker.TryGetAsync<TEntity>(id.ToString(), out var cachedEntity, cancellationToken))
         {
             var initialQuery = DbContext.Set<TEntity>().AsQueryable();
 

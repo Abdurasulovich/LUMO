@@ -1,9 +1,9 @@
-﻿using Lummo.Domain.Common.EventBus.Brokers.Interfaces;
+﻿using Lummo.Application.Common.EventBus.Brokers.Interfaces;
 using Microsoft.Extensions.Hosting;
 
 namespace Lummo.Infrastructure.Common.EventBus.Services;
 
-public abstract class EventBusBackgroundService(IEnumerable<IEventSubscriber> eventSubscribers) : BackgroundService
+public class EventBusBackgroundService(IEnumerable<IEventSubscriber> eventSubscribers) : BackgroundService
 {
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {

@@ -1,72 +1,54 @@
-﻿using Lummo.Application.Common.Identity.Services.Interfaces;
-using Lummo.Domain.Common.Query;
+﻿using FluentValidation;
+using Lummo.Application.Common.Identity.Services.Interfaces;
 using Lummo.Domain.Entities;
 using Lummo.Domain.Enums;
+using Lummo.Infrastructure.Common.Validators;
 using Lummo.Persistence.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace Lummo.Infrastructure.Common.Identity.Services;
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, UserValidator userValidator) : IUserService
 {
-    private readonly string _folderPath = "Assets/User/";
     public async ValueTask<User> CreateAsync(User user, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
+        var validationResult = userValidator
+            .Validate(user,
+                options =>
+                    options.IncludeRuleSets(EntityEvent.OnCreate.ToString()));
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
         return await userRepository.CreateAsync(user, saveChanges, cancellationToken);
     }
 
+    public async ValueTask<bool> DeleteAsync(User user, bool saveChanges = true, CancellationToken cancellationToken = default)
+        => await userRepository.DeleteAsync(user, saveChanges, cancellationToken);
+
+    public async ValueTask<bool> DeleteByIdAsync(Guid userId, bool saveChanges = true, CancellationToken cancellationToken = default)
+        => await userRepository.DeleteByIdAsync(userId, saveChanges, cancellationToken);
+
     public IQueryable<User> Get(Expression<Func<User, bool>>? predicate = null, bool asNoTracking = false)
-    {
-        return userRepository.Get(predicate, asNoTracking);
-    }
+        => userRepository.Get(predicate, asNoTracking);
 
-    public ValueTask<IList<User>> GetAsync(QuerySpecification<User> querySpecification, CancellationToken cancellationToken = default)
+    public async ValueTask<User?> GetByEmailAddressAsync(string emailAddress, bool asNoTracking = false, CancellationToken cancellationToken = default)
     {
-        return userRepository.GetAsync(querySpecification, cancellationToken);
-    }
+        var user = userRepository
+         .Get(asNoTracking: asNoTracking)
+         .Include(user => user.Roles);
 
+        return await user.FirstOrDefaultAsync(user => user.EmailAddress == emailAddress, cancellationToken: cancellationToken);
+
+    }
     public ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default)
-    {
-        return userRepository.GetByIdAsync(userId, asNoTracking, cancellationToken);
-    }
+        => userRepository.GetByIdAsync(userId, asNoTracking, cancellationToken);
 
-    public async ValueTask<Guid?> GetIdByEmailAddressAsync(string emailAddress, CancellationToken cancellationToken = default)
-    {
-        var userId = await Get(user => user.EmailAddress == emailAddress, true).Select(user => user.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-        return userId != Guid.Empty ? userId : default(Guid?);
-    }
-
-    public async ValueTask<User> GetSystemUserAsync(bool asNoTracking = false, CancellationToken cancellationToken = default)
-    {
-        return await Get(user => user.Role == RoleType.System, asNoTracking).FirstAsync(cancellationToken);
-    }
+    public ValueTask<IList<User>> GetByIdsAsync(IEnumerable<Guid> ids, bool asNoTracking = false, CancellationToken cancellationToken = default)
+        => userRepository.GetByIdsAsync(ids, asNoTracking, cancellationToken);
 
     public ValueTask<User> UpdateAsync(User user, bool saveChanges = true, CancellationToken cancellationToken = default)
-    {
-        return userRepository.UpdateAsync(user, saveChanges, cancellationToken);
-    }
-
-    public async ValueTask<string> UploadImageAsync(Guid id, IFormFile imagePath, string webRootPath, CancellationToken cancellationToken = default)
-    {
-        var findFile = await GetByIdAsync(id, cancellationToken: cancellationToken) ??
-            throw new InvalidOperationException("User with this id not found!");
-
-        var relativePath = _folderPath + id.ToString() + "." + imagePath.FileName.Split('.')[1];
-        var filePath = Path.Combine(webRootPath, relativePath);
-
-        if (File.Exists(filePath)) File.Delete(filePath);
-
-        using(var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            await imagePath.CopyToAsync(fileStream, cancellationToken);
-        }
-
-        findFile.ImageUrl = relativePath;
-        await UpdateAsync(findFile, cancellationToken: cancellationToken);
-        return relativePath;
-    }
+        => userRepository.UpdateAsync(user, saveChanges, cancellationToken);
 }
