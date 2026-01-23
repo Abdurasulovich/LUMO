@@ -13,6 +13,7 @@ namespace Lummo.Server.Controllers;
 public class AuthController(
     IMapper mapper,
     IAuthService authService,
+    IAccountService accountService,
     IRequestUserContextProvider requestuserContextProvider) : ControllerBase
 {
     [HttpPost("sign-up")]
@@ -36,7 +37,21 @@ public class AuthController(
         var result = await authService.RefreshTokenAsync(refreshTokenValue, cancellationToken);
         return Ok(mapper.Map<AccessTokenDto>(result));
     }
-    
+
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] string verificationCode, CancellationToken cancellationToken)
+    {
+        var result = await accountService.VerifyUserAsync(verificationCode, cancellationToken);
+        return result ? Ok(new { message = "Email verified successfully" }) : BadRequest(new { message = "Invalid or expired verification code" });
+    }
+
+    [HttpPost("resend-verification-code")]
+    public async Task<IActionResult> ResendVerificationCode([FromBody] string emailAddress, CancellationToken cancellationToken)
+    {
+        var result = await accountService.ResendVerificationCodeAsync(emailAddress, cancellationToken);
+        return result ? Ok(new { message = "Verification code sent successfully" }) : BadRequest(new { message = "Failed to send verification code. User may not exist or already verified." });
+    }
+
     [Authorize(Roles = "Admin, System")]
     [HttpPost("users/{userId:guid}/roles/{roleType}")]
     public async Task<IActionResult> GrandRole([FromRoute] Guid userId, [FromRoute] string roleType, CancellationToken cancellationToken)

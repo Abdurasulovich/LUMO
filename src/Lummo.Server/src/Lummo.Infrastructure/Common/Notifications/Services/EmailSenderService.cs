@@ -30,7 +30,7 @@ public class EmailSenderService(IEnumerable<IEmailSenderBroker> emailSenderBroke
 
             return result.IsSuccess;
         }, cancellationToken);
-        return false;
+        return accomplishedBroker is not null;
 
     }
 }

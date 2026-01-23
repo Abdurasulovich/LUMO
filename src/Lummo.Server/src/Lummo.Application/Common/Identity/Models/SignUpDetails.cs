@@ -5,6 +5,9 @@ public class SignUpDetails
     public string FirstName { get; set; } = default!;
 
     public string LastName { get; set; } = default!;
+
+    public string UserName { get; set; } = default!;
+
     public int Age { get; set; }
 
     public string EmailAddress { get; set; } = default!;

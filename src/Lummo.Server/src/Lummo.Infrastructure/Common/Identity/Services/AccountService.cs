@@ -1,9 +1,13 @@
 ﻿using Lummo.Application.Common.Identity.Services.Interfaces;
+using Lummo.Application.Common.Notifications.Models;
+using Lummo.Application.Common.Notifications.Services.Interfaces;
 using Lummo.Application.Common.Verifications.Services.Interfaces;
 using Lummo.Domain.Entities;
 using Lummo.Domain.Enums;
+using Lummo.Infrastructure.Common.Settings;
 using Lummo.Persistence.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Lummo.Infrastructure.Common.Identity.Services;
 
@@ -11,10 +15,15 @@ public class AccountService(
     IUserService userService,
     IUserRepository userRepository,
     IUserSettingsService userSettingsService,
-    IUserInfoVerificationCodeService userInfoVerificationCodeService
+    IUserInfoVerificationCodeService userInfoVerificationCodeService,
+    IEmailSenderService emailSenderService,
+    IEmailTemplateService emailTemplateService,
+    IEmailRenderingService emailRenderingService,
+    IOptions<SmtpEmailSenderSettings> smtpEmailSenderSettings
     ) : IAccountService
-
 {
+    private readonly SmtpEmailSenderSettings _smtpEmailSenderSettings = smtpEmailSenderSettings.Value;
+
     public async ValueTask<User> CreateUserAsync(User user, CancellationToken cancellationToken = default)
     {
         var createdUser = await userService.CreateAsync(user, cancellationToken: cancellationToken);
@@ -27,7 +36,43 @@ public class AccountService(
             cancellationToken: cancellationToken
         );
 
-        //TODO : Send welcome email
+        // Generate verification code
+        var verificationCode = await userInfoVerificationCodeService.CreateAsync(
+            VerificationCodeType.EmailAddressVerification,
+            createdUser.Id,
+            cancellationToken: cancellationToken
+        );
+
+        // Get email template
+        var emailTemplate = await emailTemplateService.GetByTypeAsync(
+            NotificationTemplateType.EmailVerificationNotification,
+            true,
+            cancellationToken
+        );
+
+        if (emailTemplate is not null)
+        {
+            // Create email message with template and variables
+            var emailMessage = new EmailMessage
+            {
+                SenderEmailAddress = _smtpEmailSenderSettings.CredentialAddress,
+                ReceiverEmailAddress = createdUser.EmailAddress,
+                Template = emailTemplate,
+                Variables = new Dictionary<string, string>
+                {
+                    { "UserName", $"{createdUser.FirstName} {createdUser.LastName}" },
+                    { "VerificationCode", verificationCode.Code },
+                    { "VerificationLink", verificationCode.VerificationLink }
+                }
+            };
+
+            // Render email with verification code
+            await emailRenderingService.RenderAsync(emailMessage, cancellationToken);
+
+            // Send verification email
+            await emailSenderService.SendAsync(emailMessage, cancellationToken);
+        }
+
         return createdUser;
     }
 
@@ -57,5 +102,55 @@ public class AccountService(
 
         await userInfoVerificationCodeService.DeactivateAsync(userVerifyCode.Code.Id, cancellationToken: cancellationToken);
         return true;
+    }
+
+    public async ValueTask<bool> ResendVerificationCodeAsync(string emailAddress, CancellationToken cancellationToken = default)
+    {
+        // Find user by email
+        var user = await GetUserByEmailAddressAsync(emailAddress, true, cancellationToken);
+
+        if (user is null)
+            return false;
+
+        // Check if already verified
+        if (user.IsEmailAddressVerified)
+            return false;
+
+        // Generate new verification code
+        var verificationCode = await userInfoVerificationCodeService.CreateAsync(
+            VerificationCodeType.EmailAddressVerification,
+            user.Id,
+            cancellationToken: cancellationToken
+        );
+
+        // Get email template
+        var emailTemplate = await emailTemplateService.GetByTypeAsync(
+            NotificationTemplateType.EmailVerificationNotification,
+            true,
+            cancellationToken
+        );
+
+        if (emailTemplate is null)
+            return false;
+
+        // Create email message with template and variables
+        var emailMessage = new EmailMessage
+        {
+            SenderEmailAddress = _smtpEmailSenderSettings.CredentialAddress,
+            ReceiverEmailAddress = user.EmailAddress,
+            Template = emailTemplate,
+            Variables = new Dictionary<string, string>
+            {
+                { "UserName", $"{user.FirstName} {user.LastName}" },
+                { "VerificationCode", verificationCode.Code },
+                { "VerificationLink", verificationCode.VerificationLink }
+            }
+        };
+
+        // Render email with verification code
+        await emailRenderingService.RenderAsync(emailMessage, cancellationToken);
+
+        // Send verification email
+        return await emailSenderService.SendAsync(emailMessage, cancellationToken);
     }
 }

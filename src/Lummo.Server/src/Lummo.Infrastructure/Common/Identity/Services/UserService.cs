@@ -34,14 +34,20 @@ public class UserService(IUserRepository userRepository, UserValidator userValid
     public IQueryable<User> Get(Expression<Func<User, bool>>? predicate = null, bool asNoTracking = false)
         => userRepository.Get(predicate, asNoTracking);
 
-    public async ValueTask<User?> GetByEmailAddressAsync(string emailAddress, bool asNoTracking = false, CancellationToken cancellationToken = default)
+    public async ValueTask<User?> GetByUsernameOrEmailAddressAsync(string userNameOrEmailAddress, bool asNoTracking = false, CancellationToken cancellationToken = default)
     {
         var user = userRepository
          .Get(asNoTracking: asNoTracking)
          .Include(user => user.Roles);
 
-        return await user.FirstOrDefaultAsync(user => user.EmailAddress == emailAddress, cancellationToken: cancellationToken);
+        var username = await user.FirstOrDefaultAsync(user => user.UserName == userNameOrEmailAddress, cancellationToken: cancellationToken);
+        if (username is not null) 
+            return username;
+        var email = await user.FirstOrDefaultAsync(user=> user.EmailAddress == userNameOrEmailAddress, cancellationToken: cancellationToken);
+        if (email is not null) 
+            return email;
 
+        return null;
     }
     public ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default)
         => userRepository.GetByIdAsync(userId, asNoTracking, cancellationToken);

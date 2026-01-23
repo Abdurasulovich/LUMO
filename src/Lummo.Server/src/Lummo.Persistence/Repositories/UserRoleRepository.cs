@@ -14,4 +14,7 @@ public class UserRoleRepository(AppDbContext dbContext, ICacheBroker cacheBroker
 
     public new ValueTask<bool> DeleteAsync(UserRole userRole, bool saveChanges, CancellationToken cancellationToken)
         => base.DeleteAsync(userRole, saveChanges, cancellationToken);
+
+    public new ValueTask<UserRole> UpdateAsync(UserRole userRole, bool saveChanges, CancellationToken cancellationToken)
+        => base.UpdateAsync(userRole, saveChanges, cancellationToken);
 }

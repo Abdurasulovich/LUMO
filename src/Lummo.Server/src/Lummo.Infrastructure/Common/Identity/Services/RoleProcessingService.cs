@@ -21,7 +21,7 @@ public class RoleProcessingService(
             ?? throw new InvalidOperationException("User not found");
 
         // Validate action permission
-        if (actionUserRole <= RoleType.Host || actionUserRole <= roleType)
+        if (actionUserRole <= RoleType.Host || actionUserRole < roleType)
             throw new AuthenticationException("User does not have permission to grand a role");
 
         if (user.Roles.Any(role => role.Type == roleType))
@@ -32,7 +32,7 @@ public class RoleProcessingService(
             ?? throw new InvalidOperationException("Role not found");
 
         // Add role to user
-        await userRoleRepository.CreateAsync(
+        await userRoleRepository.UpdateAsync(
             new UserRole
             {
                 RoleId = selectedRole.Id,
@@ -79,14 +79,14 @@ public class RoleProcessingService(
             ?? throw new AuthenticationException("Given role wasn't granted to the user.");
 
         // Validate action permission
-        if (actionUserRole <= RoleType.Host || actionUserRole <= roleType)
+        if (actionUserRole <= RoleType.Host || actionUserRole < roleType)
             throw new AuthenticationException("user doest not have permission to grand a role");
 
-        // Delete the selected role
-        await userRoleRepository.DeleteAsync(
+        var guestRole = user.Roles.FirstOrDefault(role=>role.Type == RoleType.Guest);
+        await userRoleRepository.UpdateAsync(
             new UserRole
             {
-                RoleId = selectedRole.Id,
+                RoleId = guestRole.Id,
                 UserId = userId
             },
             cancellationToken: cancellationToken

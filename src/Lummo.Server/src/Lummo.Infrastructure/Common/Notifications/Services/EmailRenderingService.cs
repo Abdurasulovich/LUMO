@@ -4,6 +4,7 @@ using Lummo.Application.Common.Notifications.Services.Interfaces;
 using Lummo.Application.Common.Settings;
 using Lummo.Domain.Enums;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -35,10 +36,14 @@ public class EmailRenderingService(IOptions<TemplateRenderingSettings> templateR
             RegexOptions.Compiled,
             TimeSpan.FromSeconds(_templateRenderingSettings.RegexMatchTimeoutInSeconds)
             );
-
+        
         var matches = placeholderRegex.Matches(emailMessage.Template.Content);
 
-        if (matches.Any() && !emailMessage.Variables.Any())
+        var subjectMatches = placeholderRegex.Matches(emailMessage.Template.Subject);
+
+        var allMatches = matches.Concat(subjectMatches).Distinct();
+
+        if (allMatches.Any() && !emailMessage.Variables.Any())
             throw new InvalidOperationException("Variables for required for this template.");
 
         var templatePlaceholder = matches.Select(
@@ -58,15 +63,17 @@ public class EmailRenderingService(IOptions<TemplateRenderingSettings> templateR
             }).ToList();
 
         ValidatePlaceholders(templatePlaceholder);
-
+        
         var messageBuilder = new StringBuilder(emailMessage.Template.Content);
         templatePlaceholder.ForEach(placeholder => messageBuilder.Replace(placeholder.Placeholder, placeholder.Value));
 
-        var message = messageBuilder.ToString();
-        emailMessage.Body = message;
-        emailMessage.Subject = emailMessage.Template.Subject;
+        var subjectBuilder = new StringBuilder(emailMessage.Template.Subject);
+        templatePlaceholder.ForEach(placeholder => subjectBuilder.Replace(placeholder.Placeholder, placeholder.Value));
 
-        return ValueTask.FromResult(message);
+        emailMessage.Body = messageBuilder.ToString(); 
+        emailMessage.Subject = subjectBuilder.ToString();
+
+        return ValueTask.FromResult(emailMessage.Body);
     }
 
     private void ValidatePlaceholders(IEnumerable<TemplatePlaceholder> templatePlaceholders)

@@ -18,6 +18,9 @@ public static class SeedDataExtensions
         if (!await appDbContext.Roles.AnyAsync())
             await appDbContext.SeedRolesAsync();
 
+        if (!await appDbContext.EmailTemplates.AnyAsync())
+            await appDbContext.SeedEmailTemplatesAsync();
+
         // check change tracker and if changes exist, save changes to database
         if (appDbContext.ChangeTracker.HasChanges())
             appDbContext.SaveChanges();
@@ -57,6 +60,58 @@ public static class SeedDataExtensions
         };
 
         await dbContext.Roles.AddRangeAsync(roles);
+        dbContext.SaveChanges();
+    }
+
+    /// <summary>
+    /// Seeds the database with initial email templates.
+    /// </summary>
+    private static async ValueTask SeedEmailTemplatesAsync(this AppDbContext dbContext)
+    {
+        var emailTemplates = new List<EmailTemplate>
+        {
+            new()
+            {
+                Id = Guid.Parse("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
+                CreatedTime = DateTimeOffset.UtcNow,
+                TemplateType = NotificationTemplateType.EmailVerificationNotification,
+                Subject = "Email Verification - {{UserName}}",
+                Content = @"
+                    <html>
+                    <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Email Verification</h2>
+                        <p>Hello {{UserName}},</p>
+                        <p>Thank you for registering with Lummo!</p>
+                        <p>Your verification code is: <strong>{{VerificationCode}}</strong></p>
+                        <p>Or click the link below to verify your email:</p>
+                        <p><a href='{{VerificationLink}}' style='background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Verify Email</a></p>
+                        <p>This code will expire in 5 minutes.</p>
+                        <br/>
+                        <p>Best regards,<br/>Lummo Team</p>
+                    </body>
+                    </html>"
+            },
+            new()
+            {
+                Id = Guid.Parse("b2c3d4e5-f6a7-8901-bcde-f12345678901"),
+                CreatedTime = DateTimeOffset.UtcNow,
+                TemplateType = NotificationTemplateType.SystemWelcomeNotification,
+                Subject = "Welcome to Lummo - {{UserName}}",
+                Content = @"
+                    <html>
+                    <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Welcome to Lummo!</h2>
+                        <p>Hello {{UserName}},</p>
+                        <p>Welcome to Lummo! We're excited to have you on board.</p>
+                        <p>Start exploring our platform and discover amazing features.</p>
+                        <br/>
+                        <p>Best regards,<br/>Lummo Team</p>
+                    </body>
+                    </html>"
+            }
+        };
+
+        await dbContext.EmailTemplates.AddRangeAsync(emailTemplates);
         dbContext.SaveChanges();
     }
 }

@@ -67,6 +67,7 @@ namespace Lummo.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     EmailAddress = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsEmailAddressVerified = table.Column<bool>(type: "bit", nullable: false),
@@ -210,6 +211,12 @@ namespace Lummo.Persistence.Migrations
                 name: "IX_Users_EmailAddress",
                 table: "Users",
                 column: "EmailAddress",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                table: "Users",
+                column: "UserName",
                 unique: true);
 
             migrationBuilder.CreateIndex(

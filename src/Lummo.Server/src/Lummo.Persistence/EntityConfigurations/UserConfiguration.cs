@@ -11,6 +11,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.FirstName).IsRequired().HasMaxLength(128);
         builder.Property(user => user.LastName).IsRequired().HasMaxLength(128);
         builder.Property(user => user.EmailAddress).IsRequired().HasMaxLength(128);
+        builder.Property(user=>user.UserName).IsRequired().HasMaxLength(128);
 
         builder.OwnsOne(user => user.UserCredentials, userCredentialsConfiguration =>
         {
@@ -19,6 +20,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         });
 
         builder.HasIndex(user => user.EmailAddress).IsUnique();
+        builder.HasIndex(user => user.UserName).IsUnique();
 
         builder
             .HasMany(user => user.Roles)

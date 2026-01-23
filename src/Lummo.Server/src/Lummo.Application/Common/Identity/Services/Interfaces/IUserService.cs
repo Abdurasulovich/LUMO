@@ -11,7 +11,7 @@ public interface IUserService
     ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User?> GetByEmailAddressAsync(string emailAddress,
+    ValueTask<User?> GetByUsernameOrEmailAddressAsync(string userNameOrEmailAddress,
         bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 

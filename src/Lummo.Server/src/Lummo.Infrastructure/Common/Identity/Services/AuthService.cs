@@ -121,11 +121,12 @@ public class AuthService(
 
     public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInAsync(SignInDetails signInDetails, CancellationToken cancellationToken = default)
     {
-        var foundUser = await userService.GetByEmailAddressAsync(signInDetails.EmailAddress, cancellationToken: cancellationToken);
+        var foundUser = await userService.GetByUsernameOrEmailAddressAsync(signInDetails.UsernameOrEmail, cancellationToken: cancellationToken) ??
+            null;
 
         if (foundUser is null ||
             !passwordHasherService.ValidatePassword(signInDetails.Password, foundUser.UserCredentials.PasswordHash))
-            throw new AuthenticationException("Sign in details are invalid, contact support.");
+            throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
 
         if (!foundUser.IsEmailAddressVerified)
             throw new AuthenticationException("Email address is not verified.");
@@ -135,7 +136,7 @@ public class AuthService(
 
     public async ValueTask<bool> SignUpAsync(SignUpDetails signUpDetails, CancellationToken cancellationToken = default)
     {
-        var foundUserId = await userService.GetByEmailAddressAsync(signUpDetails.EmailAddress, true, cancellationToken);
+        var foundUserId = await userService.GetByUsernameOrEmailAddressAsync(signUpDetails.EmailAddress, true, cancellationToken);
         if (foundUserId is not null)
             throw new InvalidOperationException("User with this email address already exists.");
 
@@ -149,7 +150,6 @@ public class AuthService(
         {
             PasswordHash = passwordHasherService.HashPassword(password)
         };
-        user.IsEmailAddressVerified = true;
         var createdUser = await accountService.CreateUserAsync(user, cancellationToken);
 
         await roleProcessingService.GrandRoleBySystemAsync(createdUser.Id, RoleType.Guest, cancellationToken);

@@ -12,11 +12,31 @@ public class UserValidator : AbstractValidator<User>
         var validationSettingsValue = validationSettings.Value;
 
 
+        // Email validation
         RuleFor(user => user.EmailAddress)
             .NotEmpty()
             .MinimumLength(5)
-            .MaximumLength(64)
-            .Matches(validationSettingsValue.EmailRegexPattern);
+            .MaximumLength(64);
+
+        if (!string.IsNullOrWhiteSpace(validationSettingsValue.EmailRegexPattern))
+        {
+            RuleFor(user => user.EmailAddress)
+                .Matches(validationSettingsValue.EmailRegexPattern)
+                .WithMessage("Email address format is invalid.");
+        }
+
+        // Username validation
+        RuleFor(user => user.UserName)
+            .NotEmpty()
+            .MinimumLength(3)
+            .MaximumLength(64);
+
+        if (!string.IsNullOrWhiteSpace(validationSettingsValue.UsernameRegexPattern))
+        {
+            RuleFor(user => user.UserName)
+                .Matches(validationSettingsValue.UsernameRegexPattern)
+                .WithMessage("Username format is invalid.");
+        }
 
         RuleFor(user => user.FirstName)
             .NotEmpty()

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lummo.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260122104914_InitialCreate")]
+    [Migration("20260123063831_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Lummo.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.12")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -206,9 +206,17 @@ namespace Lummo.Persistence.Migrations
                     b.Property<DateTimeOffset?>("ModifiedTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmailAddress")
+                        .IsUnique();
+
+                    b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("Users");

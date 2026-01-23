@@ -8,9 +8,12 @@ public interface IAccountService
         bool asNoTracking = false,
         CancellationToken cancellationToken = default);
 
-    ValueTask<User> CreateUserAsync(User user, 
+    ValueTask<User> CreateUserAsync(User user,
         CancellationToken cancellationToken = default);
 
-    ValueTask<bool> VerifyUserAsync(string code, 
+    ValueTask<bool> VerifyUserAsync(string code,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<bool> ResendVerificationCodeAsync(string emailAddress,
         CancellationToken cancellationToken = default);
 }

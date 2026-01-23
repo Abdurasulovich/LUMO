@@ -6,6 +6,7 @@ public class User : AuditableEntity
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
+    public string UserName { get; set; } = default!;
     public string EmailAddress { get; set; } = default!;
     public IList<Role> Roles {  get; set; }
     public bool IsActive { get; set; }
