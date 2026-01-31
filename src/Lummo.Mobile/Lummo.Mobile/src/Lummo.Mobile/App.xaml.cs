@@ -8,6 +8,12 @@ namespace Lummo.Mobile
         {
             InitializeComponent();
 
+            // Ensure app follows system theme
+            UserAppTheme = AppTheme.Unspecified;
+
+            // Subscribe to theme changes
+            RequestedThemeChanged += OnRequestedThemeChanged;
+
             MainPage = new AppShell();
 
 #if ANDROID
@@ -29,6 +35,17 @@ namespace Lummo.Mobile
                 handler.PlatformView.TintColor = UIKit.UIColor.FromRGB(19, 91, 236); // #135bec
             });
 #endif
+        }
+
+        private void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                // Force all bindings to re-evaluate by temporarily changing UserAppTheme
+                var newTheme = e.RequestedTheme;
+                UserAppTheme = newTheme;
+                UserAppTheme = AppTheme.Unspecified;
+            });
         }
     }
 }

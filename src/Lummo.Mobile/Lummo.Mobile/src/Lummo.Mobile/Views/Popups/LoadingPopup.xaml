@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Lummo.Mobile.Views.Popups.LoadingPopup"
+             xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+             xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
+             xmlns:imgUiHelper="clr-namespace:Lummo.Mobile.UIHelpers"
+             CloseWhenBackgroundIsClicked="False">
+    <mopups:PopupPage.Background>
+        <LinearGradientBrush EndPoint="0,0.5">
+            <GradientStop Color="{AppThemeBinding Light=#e4dcfc, Dark=#231942}" Offset="0"/>
+            <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
+        </LinearGradientBrush>
+    </mopups:PopupPage.Background>
+
+    <Grid VerticalOptions="Fill"
+          HorizontalOptions="Fill">
+        <Border StrokeThickness="0"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Background="Transparent">
+            <Border.Shadow>
+                <Shadow Brush="#b99df9" Offset="0,0" Radius="20"/>
+            </Border.Shadow>
+            <Grid  VerticalOptions="Fill">
+                <skia:SKLottieView
+                    Source="loading.json"
+                    RepeatCount="-1"
+                    HeightRequest="400"
+                    WidthRequest="400"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+
+                <Image Source="graduation"
+                       HeightRequest="100"
+                       WidthRequest="100"
+                       imgUiHelper:ImageThemeHelper.UseThemeColor="True"
+                       imgUiHelper:ImageThemeHelper.LightColor="#b99df9"
+                       imgUiHelper:ImageThemeHelper.DarkColor="#d1befb"/>
+
+            </Grid>
+        </Border>
+                <Label Text="L O A D I N G . . ."
+                       FontFamily="PoppinsMedium"
+                       FontSize="20"
+                       VerticalTextAlignment="End"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,60"
+                       TextColor="#8864748b"/>
+    </Grid>
+</mopups:PopupPage>

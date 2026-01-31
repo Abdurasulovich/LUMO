@@ -1,4 +1,6 @@
-﻿namespace Lummo.Mobile.Views.Pages;
+﻿using Lummo.Mobile.Helpers;
+
+namespace Lummo.Mobile.Views.Pages;
 
 public partial class LoginPage : ContentPage
 {
@@ -6,6 +8,18 @@ public partial class LoginPage : ContentPage
     public LoginPage()
     {
         InitializeComponent();
+    }
+
+    public async Task InitializeAsync()
+    {
+        try
+        {
+            ThemeService.Instance.NotifyThemeChanged();
+        }
+        catch (Exception ex)
+        {
+            return;
+        }
     }
     private async void EyeButtonClicked(object sender, EventArgs e)
     {
@@ -21,5 +35,14 @@ public partial class LoginPage : ContentPage
         EyeButton.Source = PasswordInput.IsPassword ? "eye_crossed" : "eye";
 
         _isToggling = false;
+    }
+
+    private async void GoToDefaultPage_Handler(object sender, TappedEventArgs e)
+    {
+    }
+
+    private async void GoToRegisterPage_Handler(object sender, TappedEventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(RegisterPage));
     }
 }

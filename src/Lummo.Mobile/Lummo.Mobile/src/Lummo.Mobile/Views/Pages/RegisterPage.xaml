@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Lummo.Mobile.Views.Pages.RegisterPage"
+             xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ct="clr-namespace:Lummo.Mobile.Controls"
+             xmlns:imgUiHelper="clr-namespace:Lummo.Mobile.UIHelpers"
+             xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             Shell.NavBarIsVisible="False"
+             ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush  EndPoint="0,0.5">
+                <GradientStop Color="{AppThemeBinding Light=#e4dcfc, Dark=#231942}" Offset="0"/>
+                <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <Grid RowDefinitions="80,*">
+                <Grid Grid.Row="0" VerticalOptions="End">
+                    <Border StrokeThickness="0"
+                            StrokeShape="Rectangle 20"
+                            HeightRequest="50"
+                            WidthRequest="50"
+                            Padding="15"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Start">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="GoToLoginPage_Handler"/>
+                        </Border.GestureRecognizers>
+                        <Image Source="arrow.png"
+                                Aspect="AspectFit"
+                                imgUiHelper:ImageThemeHelper.UseThemeColor="True"
+                                imgUiHelper:ImageThemeHelper.LightColor="#000000"
+                                imgUiHelper:ImageThemeHelper.DarkColor="#ffffff"/>
+
+                    </Border>
+
+                    <Label Grid.Column="1"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   Text="Sign Up"
+                   FontSize="22"
+                   FontFamily="PoppinsMedium"
+                   FontAttributes="Bold"/>
+                </Grid>
+                <Grid Grid.Row="1" 
+                    RowDefinitions="Auto,Auto, Auto, Auto, Auto,Auto, Auto, Auto">
+                    
+                    <skia:SKLottieView
+                    Grid.Row="0"
+                    Source="register.json"
+                    RepeatCount="-1"
+                    HeightRequest="200"
+                    WidthRequest="200"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center"/>
+
+                    <VerticalStackLayout Grid.Row="1">
+                        <Label Text="Create your account"
+                               FontAttributes="Bold"
+                               FontSize="30"
+                               FontFamily="PoppinsMedium"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Start"/>
+
+                        <Label Text="Master your exams with presonalized quizzes and gamified learning."
+                           FontSize="16"
+                           FontFamily="PoppinsLight"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Start"
+                           Margin="30,0"
+                           TextColor="#64748b"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="2" Spacing="10">
+                        <Border Grid.Row="3"
+                            Margin="20,30,20,0"
+                            StrokeShape="RoundRectangle 30"
+                            Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}"
+                            Padding="0,15">
+                        <Border.Stroke>
+                            <LinearGradientBrush  EndPoint="0,0.5">
+                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
+                            <Image Grid.Column="0" Source="search"
+                                    Aspect="AspectFit"
+                                    HeightRequest="25"/>
+                            <Label Grid.Column="1" 
+                                    Text="Register with Google"
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    FontFamily="PoppinsBold"
+                                    VerticalTextAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    </VerticalStackLayout>
+
+                    <Grid Grid.Row="3" ColumnDefinitions="*,Auto,*" 
+                        Margin="20,30,20,0" ColumnSpacing="10"
+                        VerticalOptions="Start">
+                        <BoxView Grid.Column="0" HeightRequest="0.5"
+                                    Background="#669ba9bc" VerticalOptions="Center"
+                                    CornerRadius="10"/>
+
+                        <Label Grid.Column="1"
+                               Text="Or continue with email"
+                               TextColor="{AppThemeBinding Light=#9ba9bc, Dark=#f3f4f6}"
+                               FontFamily="Poppins"
+                               FontSize="18" 
+                               VerticalOptions="Center"/>
+                        <BoxView Grid.Column="2" HeightRequest="0.5"
+                           Background="#669ba9bc"
+                           VerticalOptions="Center"
+                           CornerRadius="10"/>
+
+                    </Grid>
+
+                    <VerticalStackLayout Grid.Row="4" Spacing="10">
+
+                        <VerticalStackLayout Spacing="5" Margin="20,20,20,0">
+                            <Label Text="Username"
+                                     FontFamily="PoppinsMedium"
+                                     FontSize="16"
+                                     TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                     FontAttributes="Bold"/>
+
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                    Padding="20,5,5,5">
+                                <Border.Stroke>
+                                    <LinearGradientBrush  EndPoint="0,0.5">
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                    <Image Grid.Column="0" Source="user"
+                                            HeightRequest="25"
+                                            WidthRequest="25"
+                                            VerticalOptions="Center"
+                                            HorizontalOptions="Center">
+                                        <Image.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </Image.Behaviors>
+                                    </Image>
+
+                                    <Entry Grid.Column="1"
+                                        Placeholder="Choose a username"
+                                        PlaceholderColor="#97a5ba"
+                                        FontSize="18"
+                                        FontFamily="Poppins"
+                                        Keyboard="Email"/>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Margin="20,10,20,0">
+                            <Label Text="Email Address"
+                                    FontFamily="PoppinsMedium"
+                                    FontSize="16"
+                                    TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                    FontAttributes="Bold"/>
+
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                    Padding="20,5,5,5">
+                                <Border.Stroke>
+                                    <LinearGradientBrush  EndPoint="0,0.5">
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                    <Image Grid.Column="0" Source="envelope"
+                                        HeightRequest="25"
+                                        WidthRequest="25"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Center">
+                                        <Image.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </Image.Behaviors>
+                                    </Image>
+
+                                    <Entry Grid.Column="1"
+                                        Placeholder="student@example.com"
+                                        PlaceholderColor="#97a5ba"
+                                        FontSize="18"
+                                        FontFamily="Poppins"
+                                        Keyboard="Email"/>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Margin="20,10,20,0">
+                            <Label Text="Password"
+                                    FontFamily="PoppinsMedium"
+                                    FontSize="16"
+                                    TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                    FontAttributes="Bold"/>
+
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                    Padding="20,5">
+                                <Border.Stroke>
+                                    <LinearGradientBrush  EndPoint="0,0.5">
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
+                                    <Image Grid.Column="0" Source="lock"
+                                        HeightRequest="25"
+                                        WidthRequest="25"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Center">
+                                        <Image.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </Image.Behaviors>
+                                    </Image>
+
+                                    <Entry x:Name="PasswordInput"
+                                        Grid.Column="1"
+                                        Placeholder="8+ characters"
+                                        PlaceholderColor="#97a5ba"
+                                        FontSize="18"
+                                        FontFamily="Poppins"
+                                        IsPassword="True"/>
+
+                                    <ImageButton x:Name="EyeButton" 
+                                                 Grid.Column="2" Source="eye_crossed"
+                                                 HeightRequest="25"
+                                                 WidthRequest="25"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center"
+                                                 Clicked="EyeButtonClicked"
+                                                 Padding="10">
+                                        <ImageButton.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </ImageButton.Behaviors>
+                                    </ImageButton>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Margin="20,10,20,0">
+                            <Label Text="Confirm Password"
+                                   FontFamily="PoppinsMedium"
+                                   FontSize="16"
+                                   TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                   FontAttributes="Bold"/>
+
+                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                    Padding="20,5">
+                                <Border.Stroke>
+                                    <LinearGradientBrush  EndPoint="0,0.5">
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Stroke>
+                                <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
+                                    <Image Grid.Column="0" Source="rotation_lock"
+                                           HeightRequest="25"
+                                           WidthRequest="25"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center">
+                                        <Image.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </Image.Behaviors>
+                                    </Image>
+
+                                    <Entry x:Name="ReEnterPassworInput"
+                                           Grid.Column="1"
+                                           Placeholder="Repeat password"
+                                           PlaceholderColor="#97a5ba"
+                                           FontSize="18"
+                                           FontFamily="Poppins"
+                                           IsPassword="True"/>
+
+                                    <ImageButton x:Name="ReEnterEyeButton" 
+                                                 Grid.Column="2" Source="eye_crossed"
+                                                 HeightRequest="25"
+                                                 WidthRequest="25"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center"
+                                                 Clicked="ReEnterEyeButtonClicked"
+                                                 Padding="10">
+                                        <ImageButton.Behaviors>
+                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                        </ImageButton.Behaviors>
+                                    </ImageButton>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="15" Margin="20,10,20,0">
+                            <Border StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20"
+                                    HeightRequest="21"
+                                    WidthRequest="21"
+                                    >
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="PrivacyPolicyAgreement_Handler"/>
+                                </Border.GestureRecognizers>
+
+                                <CheckBox ScaleX="1.35"
+                                          ScaleY="1.35"
+                                          TranslationX="-0.4"
+                                          TranslationY="-0.9"
+                                          Color="#4a14ec"
+                                          x:Name="Checkbox"/>
+                            </Border>
+
+                            <Label Grid.Column="1" HorizontalTextAlignment="Start">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="I agree to the "
+                                                TextColor="#64748b"
+                                                FontFamily="PoppinsMedium"
+                                                FontSize="14"/>
+                                        <Span Text="Terms of Service "
+                                                TextColor="#4a14ec"
+                                                FontFamily="PoppinsMedium"
+                                                FontSize="14"/>
+
+                                        <Span Text="and "
+                                                   TextColor="#64748b"
+                                                   FontFamily="PoppinsMedium"
+                                                   FontSize="14"/>
+                                        <Span Text="Privacy Policy"
+                                                  TextColor="#4a14ec"
+                                                  FontFamily="PoppinsMedium"
+                                                  FontSize="14"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <Border Grid.Row="5" Background="#4913ec"
+                            StrokeShape="RoundRectangle 25"
+                            StrokeThickness="0"
+                            Padding="15"
+                            Margin="20,30,20,30">
+                        <Border.Shadow>
+                            <Shadow Brush="DarkBlue" Offset="0,2" Opacity="0.5"/>
+                        </Border.Shadow>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OpenLoading_Handler"/>
+                        </Border.GestureRecognizers>
+                        <Label  Text="Create Account"
+                                TextColor="White"
+                                FontFamily="PoppinsMedium"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"/>
+                    </Border>
+
+                    <!--#region Already have an account part-->
+                    <Label Grid.Row="6" HorizontalTextAlignment="Center" >
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Already have an account? "
+                                      TextColor="#64748b"
+                                      FontFamily="PoppinsLight"
+                                      FontSize="18"/>
+                                <Span Text="Log In"
+                                      FontAttributes="Bold"
+                                      TextColor="#4a14ec"
+                                      FontFamily="PoppinsMedium"
+                                      FontSize="18">
+                                    <Span.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="GoToLoginPage_Handler"/>
+                                    </Span.GestureRecognizers>
+                                </Span>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <!--#endregion-->
+
+                    <BoxView Grid.Row="7" 
+                            Background="Transparent" VerticalOptions="Start">
+                        <BoxView.HeightRequest>
+                            <OnPlatform x:TypeArguments="system:Double">
+                                <On Platform="iOS" Value="0"/>
+                                <On Platform="Android" Value="50"/>
+                            </OnPlatform>
+                        </BoxView.HeightRequest>
+                    </BoxView>
+                </Grid>
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -2,8 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
-
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Lummo.Mobile</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -22,11 +20,9 @@
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
+		<WindowsPackageType>None</WindowsPackageType>
+		<MtouchExtraArgs>-gcc_flags "-ObjC -rpath @executable_path/Frameworks"</MtouchExtraArgs>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -39,17 +35,69 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Fonts\poppins\Poppins-Black.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-BlackItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Bold.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-BoldItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-ExtraBold.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-ExtraBoldItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-ExtraLight.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-ExtraLightItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Italic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Light.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-LightItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Medium.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-MediumItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Regular.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-SemiBold.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-SemiBoldItalic.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-Thin.ttf" />
+	  <None Remove="Resources\Fonts\poppins\Poppins-ThinItalic.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Black.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-BlackItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Bold.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-BoldItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-ExtraBold.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-ExtraBoldItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-ExtraLight.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-ExtraLightItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Italic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Light.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-LightItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Medium.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-MediumItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Regular.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-SemiBold.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-SemiBoldItalic.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-Thin.ttf" />
+	  <MauiFont Include="Resources\Fonts\poppins\Poppins-ThinItalic.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="3.0.0-preview.4.1" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.0.0-preview.4.1" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.120" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.82" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="3.0.0" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.1" />
 		<PackageReference Include="AcrylicView.Maui" Version="2.1.3" />
+		<PackageReference Include="Mopups" Version="1.3.2" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Lummo.Mobile.Services\Lummo.Mobile.Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Pages\RegisterPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Popups\LoadingPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 </Project>

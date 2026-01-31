@@ -38,7 +38,7 @@
             <Border Grid.Row="1"
                     StrokeThickness="0"
                     StrokeShape="RoundRectangle 40 40 0 0"
-                    Background="{AppThemeBinding Light=White, Dark=Black}">
+                    Background="{AppThemeBinding Light=White, Dark={StaticResource OffBlack}}">
                 <Border.Margin>
                     <OnPlatform x:TypeArguments="Thickness">
                         <On Platform="iOS" Value="20,0,20,0"/>
@@ -135,16 +135,11 @@
                                                  WidthRequest="25"
                                                  VerticalOptions="Center"
                                                  HorizontalOptions="Center"
-                                                 Clicked="EyeButtonClicked">
+                                                 Clicked="EyeButtonClicked"
+                                                 Padding="10">
                                         <ImageButton.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </ImageButton.Behaviors>
-                                        <ImageButton.Padding>
-                                            <OnPlatform x:TypeArguments="Thickness">
-                                                <On Platform="iOS" Value="10"/>
-                                                <On Platform="Android" Value="0"/>
-                                            </OnPlatform>
-                                        </ImageButton.Padding>
                                     </ImageButton>
                                 </Grid>
                             </Border>
@@ -162,6 +157,9 @@
                                 StrokeShape="RoundRectangle 25"
                                 StrokeThickness="0"
                                 Padding="15">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="GoToDefaultPage_Handler"/>
+                            </Border.GestureRecognizers>
                             <Border.Shadow>
                                 <Shadow Brush="DarkBlue" Offset="0,2" Opacity="0.5"/>
                             </Border.Shadow>
@@ -244,7 +242,11 @@
                                       FontAttributes="Bold"
                                       TextColor="#4a14ec"
                                       FontFamily="Poppins"
-                                      FontSize="18"/>
+                                      FontSize="18">
+                                    <Span.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="GoToRegisterPage_Handler"/>
+                                    </Span.GestureRecognizers>
+                                </Span>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
