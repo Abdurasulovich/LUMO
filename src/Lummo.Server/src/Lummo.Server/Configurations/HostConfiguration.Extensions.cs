@@ -272,6 +272,11 @@ public static partial class HostConfiguration
 
     private static WebApplicationBuilder AddDevTools(this WebApplicationBuilder builder)
     {
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.ListenAnyIP(5188);
+        });
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {

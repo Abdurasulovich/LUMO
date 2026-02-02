@@ -1,0 +1,44 @@
+<Project>
+	<!-- Override the XamarinDownloadArchives task with all required parameters -->
+	<UsingTask TaskName="XamarinDownloadArchives"
+			   TaskFactory="RoslynCodeTaskFactory"
+			   AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll"
+			   Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<ParameterGroup>
+			<AllowUnsecureUrls ParameterType="System.Boolean" />
+			<Archives ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<DestinationBase ParameterType="System.String" />
+			<CacheDirectory ParameterType="System.String" />
+			<User7ZipPath ParameterType="System.String" />
+			<VsInstallRoot ParameterType="System.String" />
+			<IsAndroid ParameterType="System.Boolean" />
+			<AndroidFixManifests ParameterType="System.Boolean" />
+			<Parts ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+		</ParameterGroup>
+		<Task>
+			<Code Type="Fragment" Language="cs">
+				// No-op - packages already downloaded via NuGet
+				Parts = Archives ?? new Microsoft.Build.Framework.ITaskItem[0];
+				return true;
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<!-- Override the XamarinDownloadPartialZips task -->
+	<UsingTask TaskName="XamarinDownloadPartialZips"
+			   TaskFactory="RoslynCodeTaskFactory"
+			   AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll"
+			   Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<ParameterGroup>
+			<AllowUnsecureUrls ParameterType="System.Boolean" />
+			<Parts ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<CacheDirectory ParameterType="System.String" />
+			<IsAndroid ParameterType="System.Boolean" />
+		</ParameterGroup>
+		<Task>
+			<Code Type="Fragment" Language="cs">
+				return true;
+			</Code>
+		</Task>
+	</UsingTask>
+</Project>

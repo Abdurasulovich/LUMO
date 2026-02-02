@@ -215,6 +215,9 @@
                             Background="Transparent"
                             Padding="20"
                             Stroke="{AppThemeBinding Light=#e2e8f0, Dark=#f3f4f6}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="GoogleSignIn_Handler"/>
+                        </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
                             <Image Grid.Column="0" Source="search"
                                    Aspect="AspectFit"

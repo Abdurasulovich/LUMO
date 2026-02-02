@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Maui;
+using Lummo.Mobile.Services;
+using Lummo.Mobile.Services.Identity.Interfaces;
 using Microsoft.Extensions.Logging;
 using Mopups.Hosting;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -40,6 +42,11 @@ namespace Lummo.Mobile
                     fonts.AddFont("Poppins-Thin.ttf", "PoppinsThin");
                     fonts.AddFont("Poppins-ThinItalic.ttf", "PoppinsThinItalic");
                 });
+
+            // Services
+#if ANDROID
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+#endif
 
 #if DEBUG
             builder.Logging.AddDebug();

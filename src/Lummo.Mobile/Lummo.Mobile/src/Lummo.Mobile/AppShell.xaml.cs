@@ -8,6 +8,7 @@ namespace Lummo.Mobile
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
+            Routing.RegisterRoute(nameof(VerificationPage), typeof(VerificationPage));
         }
     }
 }

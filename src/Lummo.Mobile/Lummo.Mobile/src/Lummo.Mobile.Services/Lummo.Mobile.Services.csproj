@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Lummo.Mobile.Core\Lummo.Mobile.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Identity\Implements\" />
+  </ItemGroup>
+
 </Project>
