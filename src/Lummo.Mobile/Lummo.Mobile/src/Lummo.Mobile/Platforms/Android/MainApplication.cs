@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace Lummo.Mobile
+namespace Lummo.Mobile.Platforms.Android
 {
     [Application]
     public class MainApplication : MauiApplication

@@ -2,12 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Lummo.Mobile.Views.Pages.RegisterPage"
+             xmlns:vm="clr-namespace:Lummo.Mobile.ViewModels"
              xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:ct="clr-namespace:Lummo.Mobile.Controls"
              xmlns:imgUiHelper="clr-namespace:Lummo.Mobile.UIHelpers"
              xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              Shell.NavBarIsVisible="False"
+             x:DataType="vm:RegisterPageViewModel"
              ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
     <Grid>
         <Grid.Background>
@@ -80,6 +82,9 @@
                             StrokeShape="RoundRectangle 30"
                             Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}"
                             Padding="0,15">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ClickGoogleCommand}"/>
+                            </Border.GestureRecognizers>
                         <Border.Stroke>
                             <LinearGradientBrush  EndPoint="0,0.5">
                                 <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
@@ -122,41 +127,136 @@
 
                     <VerticalStackLayout Grid.Row="4" Spacing="10">
 
-                        <VerticalStackLayout Spacing="5" Margin="20,20,20,0">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="20,20,20,0">
+                            <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                <Label Text="First name"
+                                       FontFamily="PoppinsMedium"
+                                       FontSize="16"
+                                       TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                       FontAttributes="Bold"/>
+                                <Border StrokeThickness="{Binding IsFirstNameNotInput}"
+                                        StrokeShape="RoundRectangle 30"
+                                        Stroke="Red"
+                                        Padding="0">
+                                    <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                        StrokeShape="RoundRectangle 30"
+                                        Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                        Padding="20,5,5,5">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush  EndPoint="0,0.5">
+                                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                            <Image Grid.Column="0" Source="fr_ls_name"
+                                               HeightRequest="25"
+                                               WidthRequest="25"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center">
+                                                <Image.Behaviors>
+                                                    <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                                </Image.Behaviors>
+                                            </Image>
+
+                                            <Entry Grid.Column="1"
+                                            Placeholder="John"
+                                            PlaceholderColor="#97a5ba"
+                                            FontSize="18"
+                                            FontFamily="Poppins"
+                                            TextChanged="FirstName_TextChanged"
+                                            Text="{Binding FirstName}"
+                                            Keyboard="Text"/>
+                                        </Grid>
+                                    </Border>
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                <Label Text="Last name"
+                                       FontFamily="PoppinsMedium"
+                                       FontSize="16"
+                                       TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
+                                       FontAttributes="Bold"/>
+                                <Border StrokeThickness="{Binding IsLastNameNotInput}"
+                                        StrokeShape="RoundRectangle 30"
+                                        Stroke="Red"
+                                        Padding="0">
+                                    <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                        StrokeShape="RoundRectangle 30"
+                                        Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                        Padding="20,5,5,5">
+                                        <Border.Stroke>
+                                            <LinearGradientBrush  EndPoint="0,0.5">
+                                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                                <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Stroke>
+                                        <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                            <Image Grid.Column="0" Source="fr_ls_name"
+                                               HeightRequest="25"
+                                               WidthRequest="25"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center">
+                                                <Image.Behaviors>
+                                                    <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                                </Image.Behaviors>
+                                            </Image>
+
+                                            <Entry Grid.Column="1"
+                                               Placeholder="Doe"
+                                               PlaceholderColor="#97a5ba"
+                                               FontSize="18"
+                                               FontFamily="Poppins"
+                                               TextChanged="LastName_TextChanged"
+                                               Text="{Binding LastName}"
+                                               Keyboard="Text"/>
+                                        </Grid>
+                                    </Border>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <VerticalStackLayout Spacing="5" Margin="20,10,20,0">
                             <Label Text="Username"
                                      FontFamily="PoppinsMedium"
                                      FontSize="16"
                                      TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                      FontAttributes="Bold"/>
-
-                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                            <Border StrokeThickness="{Binding IsUserNameNotInput}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Stroke="Red"
+                                    Padding="0">
+                                <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     StrokeShape="RoundRectangle 30"
                                     Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
                                     Padding="20,5,5,5">
-                                <Border.Stroke>
-                                    <LinearGradientBrush  EndPoint="0,0.5">
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Stroke>
-                                <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
-                                    <Image Grid.Column="0" Source="user"
+                                    <Border.Stroke>
+                                        <LinearGradientBrush  EndPoint="0,0.5">
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                        <Image Grid.Column="0" Source="user"
                                             HeightRequest="25"
                                             WidthRequest="25"
                                             VerticalOptions="Center"
                                             HorizontalOptions="Center">
-                                        <Image.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </Image.Behaviors>
-                                    </Image>
+                                            <Image.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </Image.Behaviors>
+                                        </Image>
 
-                                    <Entry Grid.Column="1"
+                                        <Entry Grid.Column="1"
                                         Placeholder="Choose a username"
                                         PlaceholderColor="#97a5ba"
                                         FontSize="18"
                                         FontFamily="Poppins"
+                                        TextChanged="UserName_TextChanged"
+                                        Text="{Binding UserName}"
                                         Keyboard="Email"/>
-                                </Grid>
+                                    </Grid>
+                                </Border>
                             </Border>
                         </VerticalStackLayout>
 
@@ -166,35 +266,41 @@
                                     FontSize="16"
                                     TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                     FontAttributes="Bold"/>
-
-                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                            <Border StrokeThickness="{Binding IsEmailAdddressNotInputOrNotCorrect}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Stroke="Red"
+                                    Padding="0">
+                                <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     StrokeShape="RoundRectangle 30"
                                     Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
                                     Padding="20,5,5,5">
-                                <Border.Stroke>
-                                    <LinearGradientBrush  EndPoint="0,0.5">
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Stroke>
-                                <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
-                                    <Image Grid.Column="0" Source="envelope"
+                                    <Border.Stroke>
+                                        <LinearGradientBrush  EndPoint="0,0.5">
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                        <Image Grid.Column="0" Source="envelope"
                                         HeightRequest="25"
                                         WidthRequest="25"
                                         VerticalOptions="Center"
                                         HorizontalOptions="Center">
-                                        <Image.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </Image.Behaviors>
-                                    </Image>
+                                            <Image.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </Image.Behaviors>
+                                        </Image>
 
-                                    <Entry Grid.Column="1"
+                                        <Entry Grid.Column="1"
                                         Placeholder="student@example.com"
                                         PlaceholderColor="#97a5ba"
                                         FontSize="18"
                                         FontFamily="Poppins"
+                                        TextChanged="EmailAddress_TextChanged"
+                                        Text="{Binding EmailAddress}"
                                         Keyboard="Email"/>
-                                </Grid>
+                                    </Grid>
+                                </Border>
                             </Border>
                         </VerticalStackLayout>
 
@@ -204,37 +310,42 @@
                                     FontSize="16"
                                     TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                     FontAttributes="Bold"/>
-
-                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                            <Border StrokeThickness="{Binding IsPasswordNotInputOrNotMatch}"
+                                    StrokeShape="RoundRectangle 30"
+                                    Stroke="Red"
+                                    Padding="0">
+                                <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     StrokeShape="RoundRectangle 30"
                                     Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
                                     Padding="20,5">
-                                <Border.Stroke>
-                                    <LinearGradientBrush  EndPoint="0,0.5">
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Stroke>
-                                <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
-                                    <Image Grid.Column="0" Source="lock"
+                                    <Border.Stroke>
+                                        <LinearGradientBrush  EndPoint="0,0.5">
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
+                                        <Image Grid.Column="0" Source="lock"
                                         HeightRequest="25"
                                         WidthRequest="25"
                                         VerticalOptions="Center"
                                         HorizontalOptions="Center">
-                                        <Image.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </Image.Behaviors>
-                                    </Image>
+                                            <Image.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </Image.Behaviors>
+                                        </Image>
 
-                                    <Entry x:Name="PasswordInput"
+                                        <Entry x:Name="PasswordInput"
                                         Grid.Column="1"
                                         Placeholder="8+ characters"
                                         PlaceholderColor="#97a5ba"
                                         FontSize="18"
                                         FontFamily="Poppins"
+                                        TextChanged="Password_TextChanged"
+                                        Text="{Binding Password}"
                                         IsPassword="True"/>
 
-                                    <ImageButton x:Name="EyeButton" 
+                                        <ImageButton x:Name="EyeButton" 
                                                  Grid.Column="2" Source="eye_crossed"
                                                  HeightRequest="25"
                                                  WidthRequest="25"
@@ -242,11 +353,12 @@
                                                  HorizontalOptions="Center"
                                                  Clicked="EyeButtonClicked"
                                                  Padding="10">
-                                        <ImageButton.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </ImageButton.Behaviors>
-                                    </ImageButton>
-                                </Grid>
+                                            <ImageButton.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </ImageButton.Behaviors>
+                                        </ImageButton>
+                                    </Grid>
+                                </Border>
                             </Border>
                         </VerticalStackLayout>
 
@@ -257,48 +369,56 @@
                                    TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                    FontAttributes="Bold"/>
 
-                            <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                            <Border StrokeThickness="{Binding IsPasswordNotInputOrNotMatch}"
                                     StrokeShape="RoundRectangle 30"
-                                    Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
-                                    Padding="20,5">
-                                <Border.Stroke>
-                                    <LinearGradientBrush  EndPoint="0,0.5">
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
-                                        <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Stroke>
-                                <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
-                                    <Image Grid.Column="0" Source="rotation_lock"
-                                           HeightRequest="25"
-                                           WidthRequest="25"
-                                           VerticalOptions="Center"
-                                           HorizontalOptions="Center">
-                                        <Image.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </Image.Behaviors>
-                                    </Image>
+                                    Stroke="Red"
+                                    Padding="0">
+                                
+                                <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
+                                        StrokeShape="RoundRectangle 30"
+                                        Background="{AppThemeBinding Light=#f8fafc, Dark=#1e293b}" 
+                                        Padding="20,5">
+                                    <Border.Stroke>
+                                        <LinearGradientBrush  EndPoint="0,0.5">
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#334155}" Offset="0"/>
+                                            <GradientStop Color="{AppThemeBinding Light=#e2e8f0, Dark=#2d185a}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
+                                        <Image Grid.Column="0" Source="rotation_lock"
+                                               HeightRequest="25"
+                                               WidthRequest="25"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center">
+                                            <Image.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </Image.Behaviors>
+                                        </Image>
 
-                                    <Entry x:Name="ReEnterPassworInput"
-                                           Grid.Column="1"
-                                           Placeholder="Repeat password"
-                                           PlaceholderColor="#97a5ba"
-                                           FontSize="18"
-                                           FontFamily="Poppins"
-                                           IsPassword="True"/>
+                                        <Entry x:Name="ReEnterPassworInput"
+                                               Grid.Column="1"
+                                               Placeholder="Repeat password"
+                                               PlaceholderColor="#97a5ba"
+                                               FontSize="18"
+                                               FontFamily="Poppins"
+                                               TextChanged="RepeatPassword_TextChanged"
+                                               Text="{Binding RepeatPassword}"
+                                               IsPassword="True"/>
 
-                                    <ImageButton x:Name="ReEnterEyeButton" 
-                                                 Grid.Column="2" Source="eye_crossed"
-                                                 HeightRequest="25"
-                                                 WidthRequest="25"
-                                                 VerticalOptions="Center"
-                                                 HorizontalOptions="Center"
-                                                 Clicked="ReEnterEyeButtonClicked"
-                                                 Padding="10">
-                                        <ImageButton.Behaviors>
-                                            <mct:IconTintColorBehavior TintColor="#94a3b8"/>
-                                        </ImageButton.Behaviors>
-                                    </ImageButton>
-                                </Grid>
+                                        <ImageButton x:Name="ReEnterEyeButton" 
+                                                     Grid.Column="2" Source="eye_crossed"
+                                                     HeightRequest="25"
+                                                     WidthRequest="25"
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="Center"
+                                                     Clicked="ReEnterEyeButtonClicked"
+                                                     Padding="10">
+                                            <ImageButton.Behaviors>
+                                                <mct:IconTintColorBehavior TintColor="#94a3b8"/>
+                                            </ImageButton.Behaviors>
+                                        </ImageButton>
+                                    </Grid>
+                                </Border>
                             </Border>
                         </VerticalStackLayout>
 
@@ -306,8 +426,7 @@
                             <Border StrokeThickness="1"
                                     StrokeShape="RoundRectangle 20"
                                     HeightRequest="21"
-                                    WidthRequest="21"
-                                    >
+                                    WidthRequest="21">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="PrivacyPolicyAgreement_Handler"/>
                                 </Border.GestureRecognizers>
@@ -351,12 +470,12 @@
                             StrokeThickness="0"
                             Padding="15"
                             Margin="20,30,20,30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding RegisterUserCommand}"/>
+                        </Border.GestureRecognizers>
                         <Border.Shadow>
                             <Shadow Brush="DarkBlue" Offset="0,2" Opacity="0.5"/>
                         </Border.Shadow>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OpenLoading_Handler"/>
-                        </Border.GestureRecognizers>
                         <Label  Text="Create Account"
                                 TextColor="White"
                                 FontFamily="PoppinsMedium"

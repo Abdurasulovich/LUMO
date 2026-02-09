@@ -99,6 +99,7 @@ public static partial class HostConfiguration
             });
 
         builder.Services.AddSingleton<AccessTokenValidationMiddleware>();
+        builder.Services.AddSingleton<GlobalExceptionHandlerMiddleware>();
 
         return builder;
     }
@@ -329,6 +330,13 @@ public static partial class HostConfiguration
     private static WebApplication UseCors(this WebApplication app)
     {
         app.UseCors("AllowSpecificOrigin");
+
+        return app;
+    }
+
+    private static WebApplication UseGlobalExceptionHandler(this WebApplication app)
+    {
+        app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
         return app;
     }

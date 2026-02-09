@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace Lummo.Mobile
+namespace Lummo.Mobile.Platforms.iOS
 {
     public class Program
     {

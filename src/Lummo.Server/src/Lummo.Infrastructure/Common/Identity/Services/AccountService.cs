@@ -1,4 +1,5 @@
-﻿using Lummo.Application.Common.Identity.Services.Interfaces;
+﻿using Lummo.Application.Common.Identity.Models;
+using Lummo.Application.Common.Identity.Services.Interfaces;
 using Lummo.Application.Common.Notifications.Models;
 using Lummo.Application.Common.Notifications.Services.Interfaces;
 using Lummo.Application.Common.Verifications.Services.Interfaces;
@@ -24,8 +25,12 @@ public class AccountService(
 {
     private readonly SmtpEmailSenderSettings _smtpEmailSenderSettings = smtpEmailSenderSettings.Value;
 
-    public async ValueTask<User> CreateUserAsync(User user, CancellationToken cancellationToken = default)
+    public async ValueTask<User> CreateUserAsync(User user, bool skipEmailVerification = false, CancellationToken cancellationToken = default)
     {
+        // Agar OAuth provider (Google, Apple, etc.) orqali bo'lsa, email allaqachon verified
+        if (skipEmailVerification)
+            user.IsEmailAddressVerified = true;
+
         var createdUser = await userService.CreateAsync(user, cancellationToken: cancellationToken);
 
         await userSettingsService.CreateAsync(
@@ -35,6 +40,10 @@ public class AccountService(
             },
             cancellationToken: cancellationToken
         );
+
+        // OAuth provider orqali ro'yxatdan o'tgan userlar uchun verification skip
+        if (skipEmailVerification)
+            return createdUser;
 
         // Generate verification code
         var verificationCode = await userInfoVerificationCodeService.CreateAsync(
@@ -80,15 +89,19 @@ public class AccountService(
         => await userRepository.Get(asNoTracking: asNoTracking)
             .FirstOrDefaultAsync(user => user.EmailAddress == emailAddress, cancellationToken: cancellationToken);
 
-    public async ValueTask<bool> VerifyUserAsync(string code, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> VerifyUserAsync(EmailVerificationDetails verificationDetails, CancellationToken cancellationToken = default)
     {
-        var userVerifyCode = await userInfoVerificationCodeService.GetByCodeAsync(code, cancellationToken: cancellationToken);
+        var userVerifyCode = await userInfoVerificationCodeService.GetByCodeAsync(verificationDetails.VerificationCode, cancellationToken: cancellationToken);
 
         if (!userVerifyCode.IsValid)
             return false;
 
         var user = await userService.GetByIdAsync(userVerifyCode.Code.UserId, cancellationToken: cancellationToken)
             ?? throw new InvalidOperationException();
+
+        // Email manzilini tekshirish - kod faqat shu emailga tegishli bo'lishi kerak
+        if (!string.Equals(user.EmailAddress, verificationDetails.EmailAddress, StringComparison.OrdinalIgnoreCase))
+            return false;
 
         switch (userVerifyCode.Code.CodeType)
         {

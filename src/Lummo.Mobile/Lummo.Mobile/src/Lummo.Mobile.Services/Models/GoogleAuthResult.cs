@@ -1,4 +1,4 @@
-namespace Lummo.Mobile.Core.Models;
+namespace Lummo.Mobile.Services.Models;
 
 public class GoogleAuthResult
 {

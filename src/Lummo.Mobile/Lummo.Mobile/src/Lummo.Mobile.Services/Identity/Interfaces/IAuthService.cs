@@ -1,21 +1,20 @@
-﻿using Lummo.Mobile.Core.Models;
+﻿using Lummo.Mobile.ApiClient.Models;
+using Lummo.Mobile.Services.Models;
 
 namespace Lummo.Mobile.Services.Identity.Interfaces;
 
 public interface IAuthService
 {
-    Task<SignUpDetails> SignUpWithGoogleAsync(
-        SignUpDetails signUp,
+    Task<User> SignUpWithGoogleServiceAsync(
         CancellationToken cancellationToken = default);
-    ValueTask<bool> SignUpAsync(
-        SignUpDetails signUp,
+    ValueTask<User> SignUpAsync(
+        SignUp signUp,
         CancellationToken cancellationToken = default);
 
-    Task<SignInDetails> SignInWithGoogleAsync(
-        SignUpDetails signUp,
+    Task<bool> SignInWithGoogleServiceAsync(
         CancellationToken cancellationToken = default);
     ValueTask<bool> SignInAsync(
-        SignInDetails signIn,
+        SignIn signIn, AuthProvider authProvider,
         CancellationToken cancellationToken = default);
 
 

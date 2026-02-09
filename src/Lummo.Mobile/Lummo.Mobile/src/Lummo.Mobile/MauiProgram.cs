@@ -1,10 +1,21 @@
-﻿using CommunityToolkit.Maui;
+﻿#if ANDROID
+using Lummo.Mobile.Platforms.Android.Services;
+#endif
+#if IOS
+using Lummo.Mobile.Platforms.iOS.Services;
+#endif
+using CommunityToolkit.Maui;
+using Lummo.Mobile.ApiClient;
+using Lummo.Mobile.ApiClient.Interfaces;
 using Lummo.Mobile.Services;
 using Lummo.Mobile.Services.Identity.Interfaces;
 using Microsoft.Extensions.Logging;
 using Mopups.Hosting;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using Xe.AcrylicView;
+using Lummo.Mobile.ViewModels;
+using Lummo.Mobile.Views.Pages;
+using Lummo.Mobile.Services.Identity.Implements;
 
 namespace Lummo.Mobile
 {
@@ -43,8 +54,38 @@ namespace Lummo.Mobile
                     fonts.AddFont("Poppins-ThinItalic.ttf", "PoppinsThinItalic");
                 });
 
-            // Services
+            // Services - AVVAL dependencies keyin API client
+            builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddScoped<ITokenResolver, TokenResolver>();
+            builder.Services.AddTransient<AuthHandler>(); // Transient bo'lishi kerak
+
+            // HttpClient va API Client konfiguratsiyasi
+            builder.Services.AddHttpClient("LummoApi", client =>
+            {
+                client.BaseAddress = new Uri("http://192.168.88.134:5188/");
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .AddHttpMessageHandler<AuthHandler>();
+
+            // LummoApiClient factory bilan registratsiya - yuqoridagi named HttpClient ishlatiladi
+            builder.Services.AddScoped<ILummoApiClient>(sp =>
+            {
+                var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+                var httpClient = httpClientFactory.CreateClient("LummoApi");
+                return new LummoApiClient("http://192.168.88.134:5188/", httpClient);
+            });
+
+            // Boshqa servislar
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            // ViewModels va Pages
+            builder.Services.AddScoped<RegisterPageViewModel>();
+            builder.Services.AddScoped<RegisterPage>();
+
 #if ANDROID
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+#endif
+#if IOS
             builder.Services.AddSingleton<IAuthService, AuthService>();
 #endif
 

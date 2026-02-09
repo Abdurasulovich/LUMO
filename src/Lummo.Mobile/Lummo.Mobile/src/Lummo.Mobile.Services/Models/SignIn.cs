@@ -1,6 +1,6 @@
-﻿namespace Lummo.Mobile.Core.Models;
+﻿namespace Lummo.Mobile.Services.Models;
 
-public class SignInDetails
+public class SignIn
 {
     public string UsernameOrEmail { get; set; } = default!;
     public string Password { get; set; } = default!;

@@ -1,4 +1,6 @@
-﻿namespace Lummo.Application.Common.Identity.Models;
+using Lummo.Domain.Enums;
+
+namespace Lummo.Application.Common.Identity.Models;
 
 public class SignUpDetails
 {
@@ -15,4 +17,9 @@ public class SignUpDetails
     public string? Password { get; set; }
 
     public bool AutoGeneratePassword { get; set; }
+
+    /// <summary>
+    /// User qaysi provider orqali ro'yxatdan o'tmoqda (Email, Google, Apple, etc.)
+    /// </summary>
+    public AuthProvider AuthProvider { get; set; } = AuthProvider.Email;
 }

@@ -36,4 +36,8 @@
 		<ProjectReference Include="..\Lummo.Infrastructure\Lummo.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Dtos\" />
+	</ItemGroup>
+
 </Project>

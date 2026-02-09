@@ -5,8 +5,8 @@ using Android.Gms.Auth.Api.SignIn;
 using Android.OS;
 using Android.Views;
 using AndroidX.Core.View;
-
-namespace Lummo.Mobile
+using gr = Android.Graphics;
+namespace Lummo.Mobile.Platforms.Android
 {
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |
@@ -26,8 +26,8 @@ namespace Lummo.Mobile
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.S) // Android 12+
             {
-                Window?.SetStatusBarColor(Android.Graphics.Color.Transparent);
-                Window?.SetNavigationBarColor(Android.Graphics.Color.Transparent);
+                Window?.SetStatusBarColor(gr.Color.Transparent);
+                Window?.SetNavigationBarColor(gr.Color.Transparent);
 
                 // Blur effect
                 Window?.AddFlags(WindowManagerFlags.BlurBehind);
@@ -38,15 +38,15 @@ namespace Lummo.Mobile
             }
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.R) // Android 11
             {
-                Window?.SetStatusBarColor(Android.Graphics.Color.Transparent);
-                Window?.SetNavigationBarColor(Android.Graphics.Color.Transparent);
+                Window?.SetStatusBarColor(gr.Color.Transparent);
+                Window?.SetNavigationBarColor(gr.Color.Transparent);
             }
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop) // Android 5.0+
             {
                 Window?.ClearFlags(WindowManagerFlags.TranslucentStatus);
                 Window?.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
-                Window?.SetStatusBarColor(Android.Graphics.Color.Transparent);
-                Window?.SetNavigationBarColor(Android.Graphics.Color.Transparent);
+                Window?.SetStatusBarColor(gr.Color.Transparent);
+                Window?.SetNavigationBarColor(gr.Color.Transparent);
             }
 
             // Navigation bar ni yashirish (status bar qoladi)

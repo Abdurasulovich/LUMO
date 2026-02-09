@@ -8,6 +8,8 @@ public class UserDto
 
     public string LastName { get; set; } = default!;
 
+    public string Username { get; set; }
+
     public string EmailAddress { get; set; } = default!;
 
     public string Password { get; set; } = default!;

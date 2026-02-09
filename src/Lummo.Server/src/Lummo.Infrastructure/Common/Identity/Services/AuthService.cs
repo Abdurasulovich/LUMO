@@ -55,9 +55,8 @@ public class AuthService(
             throw new InvalidOperationException("Invalid identity security token value.");
 
         //Check refresh token and access token
-        var refreshToken = await identitySecurityTokenService.GetRefreshTokenByValueAsync(refreshTokenValue, cancellationToken);
-        if (refreshToken is null)
-            throw new AuthenticationException("Please login again.");
+        var refreshToken = await identitySecurityTokenService.GetRefreshTokenByValueAsync(refreshTokenValue, cancellationToken)
+        ?? throw new AuthenticationException("Please login again.");
 
         var accessToken = identitySecurityTokenGeneratorService.GetAccessToken(accessTokenValue);
         if (!accessToken.HasValue)
@@ -121,12 +120,20 @@ public class AuthService(
 
     public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInAsync(SignInDetails signInDetails, CancellationToken cancellationToken = default)
     {
-        var foundUser = await userService.GetByUsernameOrEmailAddressAsync(signInDetails.UsernameOrEmail, cancellationToken: cancellationToken) ??
-            null;
+        var foundUser = await userService.GetByUsernameOrEmailAddressAsync(signInDetails.UsernameOrEmail, cancellationToken: cancellationToken)
+        ?? throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
 
-        if (foundUser is null ||
-            !passwordHasherService.ValidatePassword(signInDetails.Password, foundUser.UserCredentials.PasswordHash))
-            throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
+        // User qaysi provider bilan register bo'lgan bo'lsa, shu provider bilan sign in qilishi kerak
+        if (foundUser.AuthProvider != signInDetails.AuthProvider)
+            throw new AuthenticationException($"Please sign in with {foundUser.AuthProvider}.");
+
+        // OAuth provider (Google, Apple, etc.) uchun password tekshirilmaydi
+        if (signInDetails.AuthProvider == AuthProvider.Email)
+        {
+            if (string.IsNullOrEmpty(signInDetails.Password) ||
+                !passwordHasherService.ValidatePassword(signInDetails.Password, foundUser.UserCredentials.PasswordHash))
+                throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
+        }
 
         if (!foundUser.IsEmailAddressVerified)
             throw new AuthenticationException("Email address is not verified.");
@@ -150,13 +157,16 @@ public class AuthService(
         {
             PasswordHash = passwordHasherService.HashPassword(password)
         };
-        var createdUser = await accountService.CreateUserAsync(user, cancellationToken);
+
+        // OAuth provider (Google, Apple, etc.) orqali bo'lsa email verification skip
+        var skipEmailVerification = signUpDetails.AuthProvider != AuthProvider.Email;
+
+        var createdUser = await accountService.CreateUserAsync(user, skipEmailVerification, cancellationToken);
 
         await roleProcessingService.GrandRoleBySystemAsync(createdUser.Id, RoleType.Guest, cancellationToken);
 
         // TODO : add other validation logic
-
-        return createdUser is not null;
+        return true;
     }
 
 

@@ -30,6 +30,7 @@ public static partial class HostConfiguration
         await app.MigrateDatabaseSchemasAsync();
         await app.SeedDataAsync();
         app
+            .UseGlobalExceptionHandler()
             .UseDevTools()
             .UseCors()
             .UseIdentityInfrastructure()

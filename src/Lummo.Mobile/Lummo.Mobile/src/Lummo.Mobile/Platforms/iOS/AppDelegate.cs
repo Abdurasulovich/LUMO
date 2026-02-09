@@ -1,7 +1,7 @@
 ﻿using Foundation;
 using UIKit;
 
-namespace Lummo.Mobile
+namespace Lummo.Mobile.Platforms.iOS
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate
