@@ -1,11 +1,12 @@
-﻿using Lummo.Mobile.Services.Identity.Interfaces;
+﻿using Lummo.Mobile.ApiClient.Models;
+using Lummo.Mobile.Services.Identity.Interfaces;
 using Lummo.Mobile.Services.Models;
 
 namespace Lummo.Mobile.Platforms.iOS.Services;
 
 public class AuthService : IAuthService
 {
-    public ValueTask<bool> SignInAsync(SignIn signIn, CancellationToken cancellationToken = default)
+    public ValueTask<bool> SignInAsync(SignIn signIn, AuthProvider authProvider, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

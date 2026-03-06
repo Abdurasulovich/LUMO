@@ -1,11 +1,9 @@
 ﻿using Android.App;
 using Android.Gms.Auth.Api.SignIn;
-using Lummo.Mobile.ApiClient.Exceptions;
 using Lummo.Mobile.ApiClient.Interfaces;
 using Lummo.Mobile.ApiClient.Models;
 using Lummo.Mobile.Services.Identity.Interfaces;
 using Lummo.Mobile.Services.Models;
-using Xamarin.KotlinX.Coroutines;
 
 namespace Lummo.Mobile.Platforms.Android.Services;
 
@@ -23,7 +21,7 @@ public class AuthService : IAuthService
         _activity = Platform.CurrentActivity
             ?? throw new InvalidOperationException("Activity mavjud emas");
         var gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DefaultSignIn)
-            .RequestIdToken("521797977895-dm0kr62lc1k2vn4lnhq10s0i5oi2k5r5.apps.googleusercontent.com") // Google Cloud Console dan oling
+            .RequestIdToken("608206764181-0h6b9m5h2jmtrof2u92olq73aaodcabh.apps.googleusercontent.com") // Google Cloud Console dan oling
             .RequestEmail()
             .RequestId()
             .RequestProfile()
