@@ -8,5 +8,7 @@ public enum NotificationTemplateType
     
     ReferrelNotification = 2,
 
-    PhoneNumberVerificationNotification = 3
+    PhoneNumberVerificationNotification = 3,
+
+    PasswordResetNotification = 4,
 }

@@ -16,6 +16,15 @@ public interface IAccountService
     ValueTask<bool> VerifyUserAsync(EmailVerificationDetails code,
         CancellationToken cancellationToken = default);
 
-    ValueTask<bool> ResendVerificationCodeAsync(string emailAddress,
+    ValueTask<bool> ForgotPasswordVerifyEmailAsync(ForgotPasswordEmailVerificationDetails verificationEmail,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<bool> ForgotPasswordConfirmEmailAsync(EmailVerificationDetails code,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<bool> ResendVerificationCodeAsync(ResendVerificationCodeRequest request,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<bool> ResetPasswordAsync(ResetPasswordDetails resetPasswordDetails,
         CancellationToken cancellationToken = default);
 }

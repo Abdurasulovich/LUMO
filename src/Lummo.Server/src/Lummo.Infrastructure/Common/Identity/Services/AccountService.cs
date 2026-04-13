@@ -1,4 +1,5 @@
-﻿using Lummo.Application.Common.Identity.Models;
+﻿using Azure.Core;
+using Lummo.Application.Common.Identity.Models;
 using Lummo.Application.Common.Identity.Services.Interfaces;
 using Lummo.Application.Common.Notifications.Models;
 using Lummo.Application.Common.Notifications.Services.Interfaces;
@@ -9,6 +10,7 @@ using Lummo.Infrastructure.Common.Settings;
 using Lummo.Persistence.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.CodeDom;
 
 namespace Lummo.Infrastructure.Common.Identity.Services;
 
@@ -20,6 +22,7 @@ public class AccountService(
     IEmailSenderService emailSenderService,
     IEmailTemplateService emailTemplateService,
     IEmailRenderingService emailRenderingService,
+    IPasswordHasherService passwordHasherService,
     IOptions<SmtpEmailSenderSettings> smtpEmailSenderSettings
     ) : IAccountService
 {
@@ -117,10 +120,10 @@ public class AccountService(
         return true;
     }
 
-    public async ValueTask<bool> ResendVerificationCodeAsync(string emailAddress, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> ResendVerificationCodeAsync(ResendVerificationCodeRequest request, CancellationToken cancellationToken = default)
     {
         // Find user by email
-        var user = await GetUserByEmailAddressAsync(emailAddress, true, cancellationToken);
+        var user = await GetUserByEmailAddressAsync(request.EmailAddress, true, cancellationToken);
 
         if (user is null)
             return false;
@@ -165,5 +168,102 @@ public class AccountService(
 
         // Send verification email
         return await emailSenderService.SendAsync(emailMessage, cancellationToken);
+    }
+
+    public async ValueTask<bool> ForgotPasswordVerifyEmailAsync(
+        ForgotPasswordEmailVerificationDetails verificationEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await GetUserByEmailAddressAsync(
+            verificationEmail.EmailAddress, true, cancellationToken);
+
+        if (user is null)
+            return false;
+
+        var verificationCode = await userInfoVerificationCodeService.CreateAsync(
+            VerificationCodeType.PasswordReset,
+            user.Id,
+            cancellationToken: cancellationToken
+        );
+
+        var emailTemplate = await emailTemplateService.GetByTypeAsync(
+            NotificationTemplateType.PasswordResetNotification,
+            true,
+            cancellationToken
+        );
+
+        if (emailTemplate is null)
+            return false;
+
+        var emailMessage = new EmailMessage
+        {
+            SenderEmailAddress = _smtpEmailSenderSettings.CredentialAddress,
+            ReceiverEmailAddress = user.EmailAddress,
+            Template = emailTemplate,
+            Variables = new Dictionary<string, string>
+        {
+            { "UserName", $"{user.FirstName} {user.LastName}" },
+            { "VerificationCode", verificationCode.Code },
+            { "VerificationLink", verificationCode.VerificationLink }
+        }
+        };
+
+        await emailRenderingService.RenderAsync(emailMessage, cancellationToken);
+
+        return await emailSenderService.SendAsync(emailMessage, cancellationToken);
+    }
+
+    public async ValueTask<bool> ResetPasswordAsync(ResetPasswordDetails resetPasswordDetails, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var user = await userService.GetByIdAsync(resetPasswordDetails.UserId, cancellationToken: cancellationToken);
+            if (user is not null)
+            {
+                user.UserCredentials = new UserCredentials
+                {
+                    PasswordHash = passwordHasherService.HashPassword(resetPasswordDetails.NewPassword)
+                };
+
+                await userService.UpdateAsync(user, false, cancellationToken: cancellationToken);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new NotImplementedException("Password reset failed. User not found or update failed.", ex);
+        }
+    }
+
+    public async ValueTask<bool> ForgotPasswordConfirmEmailAsync(EmailVerificationDetails verificationDetails, CancellationToken cancellationToken = default)
+    {
+        var userVerifyCode = await userInfoVerificationCodeService.GetByCodeAsync(verificationDetails.VerificationCode, cancellationToken: cancellationToken);
+
+        if (!userVerifyCode.IsValid)
+            return false;
+
+        var user = await userService.GetByIdAsync(userVerifyCode.Code.UserId, cancellationToken: cancellationToken)
+            ?? throw new InvalidOperationException();
+
+        // Email manzilini tekshirish - kod faqat shu emailga tegishli bo'lishi kerak
+        if (!string.Equals(user.EmailAddress, verificationDetails.EmailAddress, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        switch (userVerifyCode.Code.CodeType)
+        {
+            case VerificationCodeType.PasswordReset:
+                user.IsEmailAddressVerified = true;
+                await userService.UpdateAsync(user, false, cancellationToken: cancellationToken);
+                break;
+            default:
+                throw new NotSupportedException();
+        }
+
+        await userInfoVerificationCodeService.DeactivateAsync(userVerifyCode.Code.Id, cancellationToken: cancellationToken);
+        return true;
     }
 }

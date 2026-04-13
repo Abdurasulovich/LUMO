@@ -23,6 +23,13 @@ public class AuthController(
         return result ? Ok(result) : BadRequest();
     }
 
+    [HttpPost("sign-up-with-google")]
+    public async ValueTask<ActionResult<IdentityTokenDto>> SignUpWithGoogle([FromBody] GoogleSignInRequest idToken, CancellationToken cancellationToken)
+    {
+        var result = await authService.SignUpWithGoogleAsync(idToken, cancellationToken);
+        return Ok(mapper.Map<IdentityTokenDto>(result));
+    }
+
     [HttpPost("sign-in")]
     public async ValueTask<ActionResult<IdentityTokenDto>> SignIn([FromBody] SignInDetails signInDetails, CancellationToken cancellationToken)
     {
@@ -30,7 +37,12 @@ public class AuthController(
 
         return Ok(mapper.Map<IdentityTokenDto>(result));
     }
-
+    [HttpPost("sign-in-with-google")]
+    public async ValueTask<ActionResult<IdentityTokenDto>> SignInWithGoogle([FromBody] GoogleSignInRequest googleSignInRequest, CancellationToken cancellationToken)
+    {
+        var result = await authService.SignInWithGoogleAsync(googleSignInRequest, cancellationToken);
+        return Ok(mapper.Map<IdentityTokenDto>(result));
+    }
     [HttpPut("refresh-token")]
     public async ValueTask<ActionResult<AccessTokenDto>> RefreshToken([FromBody] string refreshTokenValue, CancellationToken cancellationToken)
     {
@@ -45,10 +57,29 @@ public class AuthController(
         return result ? Ok(new { message = "Email verified successfully" }) : BadRequest(new { message = "Invalid or expired verification code" });
     }
 
-    [HttpPost("resend-verification-code")]
-    public async ValueTask<ActionResult<bool>> ResendVerificationCode([FromBody] string emailAddress, CancellationToken cancellationToken)
+    [HttpPost("forgot-password-verify-email")]
+    public async ValueTask<ActionResult<bool>> ForgotPasswordVerifyEmail([FromBody] ForgotPasswordEmailVerificationDetails verificationEmail, CancellationToken cancellationToken)
     {
-        var result = await accountService.ResendVerificationCodeAsync(emailAddress, cancellationToken);
+        var result = await accountService.ForgotPasswordVerifyEmailAsync(verificationEmail, cancellationToken);
+        return result ? Ok(new { message = "Verification code sent successfully" }) : BadRequest(new { message = "Failed to send verification code. User may not exist." });
+    }
+    [HttpPost("forgot-password-verify-code")]
+    public async ValueTask<ActionResult<bool>> ForgotPasswordVerifyCode([FromBody] EmailVerificationDetails verificationCode, CancellationToken cancellationToken)
+    {
+        var result = await accountService.ForgotPasswordConfirmEmailAsync(verificationCode, cancellationToken);
+        return result ? Ok(new { message = "Verification code is valid" }) : BadRequest(new { message = "Invalid or expired verification code" });
+    }
+    [HttpPost("reset-password")]
+    public async ValueTask<ActionResult<bool>> ResetPassword([FromBody] ResetPasswordDetails resetPasswordDetails, CancellationToken cancellationToken)
+    {
+        var result = await accountService.ResetPasswordAsync(resetPasswordDetails, cancellationToken);
+        return result ? Ok(new { message = "Password reset successfully" }) : BadRequest(new { message = "Invalid or expired verification code" });
+    }
+
+    [HttpPost("resend-verification-code")]
+    public async ValueTask<ActionResult<bool>> ResendVerificationCode([FromBody] ResendVerificationCodeRequest request, CancellationToken cancellationToken)
+    {
+        var result = await accountService.ResendVerificationCodeAsync(request, cancellationToken);
         return result ? Ok(new { message = "Verification code sent successfully" }) : BadRequest(new { message = "Failed to send verification code. User may not exist or already verified." });
     }
 

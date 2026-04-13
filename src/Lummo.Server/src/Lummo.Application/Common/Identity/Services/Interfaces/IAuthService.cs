@@ -9,8 +9,14 @@ public interface IAuthService
         SignUpDetails signUpDetails,
         CancellationToken cancellationToken = default);
 
+    ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignUpWithGoogleAsync(GoogleSignInRequest idToken,
+        CancellationToken cancellationToken = default);
+
     ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInAsync(
         SignInDetails signInDetails,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInWithGoogleAsync(GoogleSignInRequest idToken,
         CancellationToken cancellationToken = default);
 
     ValueTask<bool> GrandRoleAsync(Guid userId,

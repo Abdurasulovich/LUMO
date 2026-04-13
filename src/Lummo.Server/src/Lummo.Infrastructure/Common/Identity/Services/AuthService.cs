@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Lummo.Application.Common.Identity.Models;
 using Lummo.Application.Common.Identity.Services.Interfaces;
 using Lummo.Domain.Brokers;
@@ -85,7 +86,7 @@ public class AuthService(
             .FirstOrDefaultAsync(cancellationToken: cancellationToken)
             ?? throw new InvalidOperationException();
 
-        if(foundAccessToken is not null && !foundAccessToken.IsRevoked)
+        if (foundAccessToken is not null && !foundAccessToken.IsRevoked)
         {
             if (!foundAccessToken.IsRevoked)
                 return foundAccessToken;
@@ -118,27 +119,48 @@ public class AuthService(
         return true;
     }
 
-    public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInAsync(SignInDetails signInDetails, CancellationToken cancellationToken = default)
+    public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInAsync(
+        SignInDetails signInDetails,
+        CancellationToken cancellationToken = default)
     {
-        var foundUser = await userService.GetByUsernameOrEmailAddressAsync(signInDetails.UsernameOrEmail, cancellationToken: cancellationToken)
-        ?? throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
+        // ─── Email / Password Sign-In ─────────────────────────────────────────────
+        var foundUser = await userService
+            .GetByUsernameOrEmailAddressAsync(signInDetails.UsernameOrEmail, cancellationToken: cancellationToken);
 
-        // User qaysi provider bilan register bo'lgan bo'lsa, shu provider bilan sign in qilishi kerak
-        if (foundUser.AuthProvider != signInDetails.AuthProvider)
-            throw new AuthenticationException($"Please sign in with {foundUser.AuthProvider}.");
+        // User bazada yo'q → register bo'lishi kerakligini aytyapmiz
+        if (foundUser is null)
+            throw new AuthenticationException(
+                "No account found with this email. Please register first.");
 
-        // OAuth provider (Google, Apple, etc.) uchun password tekshirilmaydi
-        if (signInDetails.AuthProvider == AuthProvider.Email)
-        {
-            if (string.IsNullOrEmpty(signInDetails.Password) ||
-                !passwordHasherService.ValidatePassword(signInDetails.Password, foundUser.UserCredentials.PasswordHash))
-                throw new AuthenticationException("Sign in details are invalid, please check the your info is correct!");
-        }
+        // User boshqa provider bilan register bo'lgan (masalan Google)
+        if (foundUser.AuthProvider != AuthProvider.Email)
+            throw new AuthenticationException(
+                $"This account was registered via {foundUser.AuthProvider}. Please sign in with {foundUser.AuthProvider}.");
 
+        // Password tekshiruvi
+        if (string.IsNullOrEmpty(signInDetails.Password) ||
+            !passwordHasherService.ValidatePassword(signInDetails.Password, foundUser.UserCredentials.PasswordHash))
+            throw new AuthenticationException(
+                "Sign in details are invalid, please check your info is correct!");
+
+        // Email verification tekshiruvi
         if (!foundUser.IsEmailAddressVerified)
             throw new AuthenticationException("Email address is not verified.");
 
         return await CreateTokens(foundUser, cancellationToken);
+    }
+
+    public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignInWithGoogleAsync(GoogleSignInRequest idToken, CancellationToken cancellationToken = default)
+    {
+        var payload = await VerifyGoogleTokenService.VerifyGoogleToken(idToken.GoogleIdToken);
+
+        if (payload is null || string.IsNullOrEmpty(payload.Email))
+            throw new AuthenticationException("Invalid Google ID token.");
+
+        // Google orqali: user yo'q bo'lsa — register qilib token qaytaramiz
+        return await SignUpWithGoogleAsync(
+            new GoogleSignInRequest { GoogleIdToken = idToken.GoogleIdToken},
+            cancellationToken);
     }
 
     public async ValueTask<bool> SignUpAsync(SignUpDetails signUpDetails, CancellationToken cancellationToken = default)
@@ -169,6 +191,52 @@ public class AuthService(
         return true;
     }
 
+    public async ValueTask<(AccessToken accessToken, RefreshToken refreshToken)> SignUpWithGoogleAsync(GoogleSignInRequest idToken, CancellationToken cancellationToken = default)
+    {
+        GoogleJsonWebSignature.Payload? payload = await VerifyGoogleTokenService.VerifyGoogleToken(idToken.GoogleIdToken);
+        if (payload is not null && !string.IsNullOrEmpty(payload.Email))
+        {
+            var foundUserId = await userService.GetByUsernameOrEmailAddressAsync(payload.Email, true, cancellationToken);
+            if (foundUserId is not null)
+            {
+                return await CreateTokens(foundUserId, cancellationToken);
+            }
+            var signupDetails = new SignUpDetails
+            {
+                FirstName = payload?.GivenName ?? string.Empty,
+                LastName = payload?.FamilyName ?? string.Empty,
+                EmailAddress = payload?.Email ?? string.Empty,
+                AuthProvider = AuthProvider.Google,
+                AutoGeneratePassword = true,
+                Age = 0,
+                UserName = payload?.Email.Split("@")[0] ?? string.Empty
+            };
+            var user = mapper.Map<User>(signupDetails);
+
+            var password = signupDetails.AutoGeneratePassword
+                ? passwordGeneratorService.GeneratePassword()
+                : passwordGeneratorService.GetValidatePassword(signupDetails.Password!, user);
+
+            user.UserCredentials = new UserCredentials
+            {
+                PasswordHash = passwordHasherService.HashPassword(password)
+            };
+
+            // OAuth provider (Google, Apple, etc.) orqali bo'lsa email verification skip
+            var skipEmailVerification = signupDetails.AuthProvider != AuthProvider.Email;
+
+            var createdUser = await accountService.CreateUserAsync(user, skipEmailVerification, cancellationToken);
+
+            await roleProcessingService.GrandRoleBySystemAsync(createdUser.Id, RoleType.Guest, cancellationToken);
+
+            // TODO : add other validation logic
+            return await CreateTokens(createdUser, cancellationToken);
+        }
+        else
+        {
+            throw new AuthenticationException("Invalid Google ID token.");
+        }
+    }
 
     private async Task<(AccessToken AccessToken, RefreshToken RefreshToken)> CreateTokens(User user, CancellationToken cancellationToken = default)
     {

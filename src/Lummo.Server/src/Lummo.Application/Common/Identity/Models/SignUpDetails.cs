@@ -18,6 +18,8 @@ public class SignUpDetails
 
     public bool AutoGeneratePassword { get; set; }
 
+    public string GoogleIdToken { get; set; } = default!;
+
     /// <summary>
     /// User qaysi provider orqali ro'yxatdan o'tmoqda (Email, Google, Apple, etc.)
     /// </summary>
