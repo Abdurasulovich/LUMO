@@ -6,19 +6,23 @@
              xmlns:ct="clr-namespace:Lummo.Mobile.Controls"
              xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:vm="clr-namespace:Lummo.Mobile.ViewModels"
              Shell.NavBarIsVisible="False"
+             x:DataType="vm:LoginPageViewModel"
              ct:CustomStatusBarBehavior.StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}">
+
     <ScrollView VerticalScrollBarVisibility="Never">
         <Grid RowDefinitions="*,3*">
+
+            <!-- Top gradient + Lottie -->
             <Border Grid.RowSpan="2"
-                    Grid.Row="0"
                     HeightRequest="300"
                     VerticalOptions="Start"
                     StrokeThickness="0"
                     StrokeShape="RoundRectangle 0 0 40 40">
                 <Border.Margin>
                     <OnPlatform x:TypeArguments="Thickness">
-                        <On Platform="iOS" Value="0,-61,0,0"/>
+                        <On Platform="iOS"     Value="0,-61,0,0"/>
                         <On Platform="Android" Value="0"/>
                     </OnPlatform>
                 </Border.Margin>
@@ -34,38 +38,39 @@
                                    WidthRequest="300"/>
             </Border>
 
-            <!-- Content border -->
+            <!-- Content card -->
             <Border Grid.Row="1"
                     StrokeThickness="0"
                     StrokeShape="RoundRectangle 40 40 0 0"
                     Background="{AppThemeBinding Light=White, Dark={StaticResource OffBlack}}">
                 <Border.Margin>
                     <OnPlatform x:TypeArguments="Thickness">
-                        <On Platform="iOS" Value="20,0,20,0"/>
+                        <On Platform="iOS"     Value="20,0,20,0"/>
                         <On Platform="Android" Value="20,90,20,0"/>
                     </OnPlatform>
                 </Border.Margin>
 
-                <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0,20,0,0">
-                    <!--#region Welcome title-->
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,20,0,0">
+
+                    <!-- Title + subtitle -->
                     <VerticalStackLayout Grid.Row="0" Spacing="5">
                         <Label Text="Welcome back!"
                                FontSize="36"
                                FontAttributes="Bold"
                                FontFamily="Poppins"
                                HorizontalTextAlignment="Center"/>
-                        <Label Text="Ready to ace your next exam?"
-                               TextColor="#64748b"
+                        <Label Text="{Binding Message}"
+                               TextColor="{Binding MessageColor}"
                                HorizontalOptions="Center"
                                FontSize="18"
                                FontFamily="Poppins"/>
                     </VerticalStackLayout>
-                    <!--#endregion-->
 
-                    <!--#region Email or username and password part-->
+                    <!-- Fields -->
                     <VerticalStackLayout Grid.Row="1" Margin="20,50,20,0" Spacing="25">
-                        <!--#region Email or username part-->
-                        <VerticalStackLayout Spacing="10">
+
+                        <!-- Email field -->
+                        <VerticalStackLayout Spacing="6">
                             <Label Text="Email or Username"
                                    FontFamily="Poppins"
                                    FontSize="18"
@@ -75,32 +80,37 @@
                             <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
                                     StrokeShape="RoundRectangle 25"
-                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
+                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}"
                                     Padding="20,10,5,10">
-                                <Grid ColumnDefinitions="30, *" ColumnSpacing="5">
+                                <Grid ColumnDefinitions="30,*" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="envelope"
-                                           HeightRequest="25"
-                                           WidthRequest="25"
-                                           VerticalOptions="Center"
-                                           HorizontalOptions="Center">
+                                           HeightRequest="25" WidthRequest="25"
+                                           VerticalOptions="Center" HorizontalOptions="Center">
                                         <Image.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </Image.Behaviors>
                                     </Image>
-
                                     <Entry Grid.Column="1"
                                            Placeholder="student@example.com"
+                                           Text="{Binding EmailAddress}"
                                            PlaceholderColor="#97a5ba"
                                            FontSize="18"
                                            FontFamily="Poppins"
                                            Keyboard="Email"/>
                                 </Grid>
                             </Border>
-                        </VerticalStackLayout>
-                        <!--#endregion-->
 
-                        <!--#region Password part-->
-                        <VerticalStackLayout Spacing="10">
+                            <!-- Email inline error -->
+                            <Label Text="{Binding EmailError}"
+                                   TextColor="#d00000"
+                                   FontFamily="Poppins"
+                                   FontSize="13"
+                                   Margin="10,0,0,0"
+                                   IsVisible="{Binding HasEmailError}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Password field -->
+                        <VerticalStackLayout Spacing="6">
                             <Label Text="Password"
                                    FontFamily="Poppins"
                                    FontSize="18"
@@ -110,31 +120,27 @@
                             <Border StrokeThickness="{AppThemeBinding Light=0, Dark=1}"
                                     Stroke="{AppThemeBinding Light=Transparent, Dark=#f3f4f6}"
                                     StrokeShape="RoundRectangle 25"
-                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}" 
+                                    Background="{AppThemeBinding Light=#f3f4f6, Dark=Transparent}"
                                     Padding="20,10">
-                                <Grid ColumnDefinitions="30, *, 30" ColumnSpacing="5">
+                                <Grid ColumnDefinitions="30,*,30" ColumnSpacing="5">
                                     <Image Grid.Column="0" Source="lock"
-                                           HeightRequest="25"
-                                           WidthRequest="25"
-                                           VerticalOptions="Center"
-                                           HorizontalOptions="Center">
+                                           HeightRequest="25" WidthRequest="25"
+                                           VerticalOptions="Center" HorizontalOptions="Center">
                                         <Image.Behaviors>
                                             <mct:IconTintColorBehavior TintColor="#94a3b8"/>
                                         </Image.Behaviors>
                                     </Image>
-
                                     <Entry x:Name="PasswordInput" Grid.Column="1"
                                            Placeholder="••••••••"
                                            PlaceholderColor="#97a5ba"
                                            FontSize="18"
                                            FontFamily="Poppins"
+                                           Text="{Binding Password}"
                                            IsPassword="True"/>
-
-                                    <ImageButton x:Name="EyeButton" Grid.Column="2" Source="eye_crossed"
-                                                 HeightRequest="25"
-                                                 WidthRequest="25"
-                                                 VerticalOptions="Center"
-                                                 HorizontalOptions="Center"
+                                    <ImageButton x:Name="EyeButton" Grid.Column="2"
+                                                 Source="eye_crossed"
+                                                 HeightRequest="25" WidthRequest="25"
+                                                 VerticalOptions="Center" HorizontalOptions="Center"
                                                  Clicked="EyeButtonClicked"
                                                  Padding="10">
                                         <ImageButton.Behaviors>
@@ -143,22 +149,35 @@
                                     </ImageButton>
                                 </Grid>
                             </Border>
+
+                            <!-- Password inline error -->
+                            <Label Text="{Binding PasswordError}"
+                                   TextColor="#d00000"
+                                   FontFamily="Poppins"
+                                   FontSize="13"
+                                   Margin="10,0,0,0"
+                                   IsVisible="{Binding HasPasswordError}"/>
+
                             <Label Text="Forgot Password?"
                                    TextColor="#4913ec"
                                    FontFamily="Poppins"
                                    FontAttributes="Bold"
                                    FontSize="18"
-                                   HorizontalTextAlignment="End"/>
+                                   HorizontalTextAlignment="End">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                         </VerticalStackLayout>
-                        <!--#endregion-->
 
-                        <!--#region Login button-->
+                        <!-- Log In button -->
                         <Border Background="#4913ec"
                                 StrokeShape="RoundRectangle 25"
                                 StrokeThickness="0"
-                                Padding="15">
+                                Padding="15"
+                                Opacity="{Binding IsBusy, Converter={mct:InvertedBoolConverter}}">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="GoToDefaultPage_Handler"/>
+                                <TapGestureRecognizer Command="{Binding ViaEmailCommand}"/>
                             </Border.GestureRecognizers>
                             <Border.Shadow>
                                 <Shadow Brush="DarkBlue" Offset="0,2" Opacity="0.5"/>
@@ -172,10 +191,8 @@
                                        FontAttributes="Bold"
                                        HorizontalTextAlignment="End"
                                        VerticalTextAlignment="Center"/>
-                                <Image Grid.Column="1"
-                                       Source="arrow_right.png"
-                                       HeightRequest="25"
-                                       WidthRequest="25"
+                                <Image Grid.Column="1" Source="arrow_right.png"
+                                       HeightRequest="25" WidthRequest="25"
                                        HorizontalOptions="Start"
                                        VerticalOptions="Center">
                                     <Image.Behaviors>
@@ -184,45 +201,57 @@
                                 </Image>
                             </Grid>
                         </Border>
-                        <!--#endregion-->
+
+                        <!-- General error (backend / network) -->
+                        <Border IsVisible="{Binding HasGeneralError}"
+                                StrokeShape="RoundRectangle 15"
+                                StrokeThickness="0"
+                                Background="#fff1f2"
+                                Padding="16,12">
+                            <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                                <Label Grid.Column="0" Text="⚠️"
+                                       FontSize="16" VerticalOptions="Center"/>
+                                <Label Grid.Column="1"
+                                       Text="{Binding GeneralError}"
+                                       TextColor="#b91c1c"
+                                       FontFamily="Poppins"
+                                       FontSize="14"
+                                       LineBreakMode="WordWrap"/>
+                            </Grid>
+                        </Border>
+
                     </VerticalStackLayout>
-                    <!--#endregion-->
 
-                    <!--#region Or continue title part-->
-                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" 
-                          Margin="20,50,20,0" ColumnSpacing="10">
+                    <!-- Divider -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*"
+                          Margin="20,30,20,0" ColumnSpacing="10">
                         <BoxView Grid.Column="0" HeightRequest="0.5"
-                                 Background="#e2e8f0" VerticalOptions="Center"
-                                 CornerRadius="10"/>
-
+                                 Background="#e2e8f0" VerticalOptions="Center" CornerRadius="10"/>
                         <Label Grid.Column="1"
                                Text="Or continue with"
                                TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                FontFamily="Poppins"
-                               FontSize="18" 
+                               FontSize="18"
                                VerticalOptions="Center"/>
                         <BoxView Grid.Column="2" HeightRequest="0.5"
-                                 Background="#e2e8f0"
-                                 VerticalOptions="Center"
-                                 CornerRadius="10"/>
+                                 Background="#e2e8f0" VerticalOptions="Center" CornerRadius="10"/>
                     </Grid>
-                    <!--#endregion-->
 
-                    <!--#region Google button-->
+                    <!-- Google button -->
                     <Border Grid.Row="3"
                             Margin="20,30,20,0"
                             StrokeShape="RoundRectangle 25"
                             Background="Transparent"
                             Padding="20"
-                            Stroke="{AppThemeBinding Light=#e2e8f0, Dark=#f3f4f6}">
+                            Stroke="{AppThemeBinding Light=#e2e8f0, Dark=#f3f4f6}"
+                            Opacity="{Binding IsBusy, Converter={mct:InvertedBoolConverter}}">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="GoogleSignIn_Handler"/>
+                            <TapGestureRecognizer Command="{Binding ViaGoogleCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" HorizontalOptions="Center">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" HorizontalOptions="Center">
                             <Image Grid.Column="0" Source="search"
-                                   Aspect="AspectFit"
-                                   HeightRequest="25"/>
-                            <Label Grid.Column="1" 
+                                   Aspect="AspectFit" HeightRequest="25"/>
+                            <Label Grid.Column="1"
                                    Text="Google"
                                    TextColor="{AppThemeBinding Light=#424f62, Dark=#f3f4f6}"
                                    FontAttributes="Bold"
@@ -231,9 +260,8 @@
                                    VerticalTextAlignment="Center"/>
                         </Grid>
                     </Border>
-                    <!--#endregion-->
 
-                    <!--#region No account title part-->
+                    <!-- Register link -->
                     <Label Grid.Row="4" HorizontalTextAlignment="Center" Margin="0,30,0,0">
                         <Label.FormattedText>
                             <FormattedString>
@@ -247,23 +275,23 @@
                                       FontFamily="Poppins"
                                       FontSize="18">
                                     <Span.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="GoToRegisterPage_Handler"/>
+                                        <TapGestureRecognizer Command="{Binding GotoRegisterPageCommand}"/>
                                     </Span.GestureRecognizers>
                                 </Span>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
-                    <!--#endregion-->
 
-                    <BoxView Grid.Row="5" 
-                             Background="Transparent" VerticalOptions="Start">
+                    <!-- Bottom spacer -->
+                    <BoxView Grid.Row="5" Background="Transparent" VerticalOptions="Start">
                         <BoxView.HeightRequest>
                             <OnPlatform x:TypeArguments="system:Double">
-                                <On Platform="iOS" Value="0"/>
+                                <On Platform="iOS"     Value="0"/>
                                 <On Platform="Android" Value="50"/>
                             </OnPlatform>
                         </BoxView.HeightRequest>
                     </BoxView>
+
                 </Grid>
             </Border>
         </Grid>

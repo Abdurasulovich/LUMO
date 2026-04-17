@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Platform;
+using System.Runtime.CompilerServices;
 
 namespace Lummo.Mobile.UIHelpers;
 
@@ -14,145 +15,159 @@ public static class ImageThemeHelper
 
     public static bool GetUseThemeColor(BindableObject view)
         => (bool)view.GetValue(UseThemeColorProperty);
-
     public static void SetUseThemeColor(BindableObject view, bool value)
         => view.SetValue(UseThemeColorProperty, value);
 
-    // Color for Light mode
     public static readonly BindableProperty LightColorProperty =
-        BindableProperty.CreateAttached(
-            "LightColor",
-            typeof(string),
-            typeof(ImageThemeHelper),
-            "#97a5ba"); // Default .NET MAUI color
-
+        BindableProperty.CreateAttached("LightColor", typeof(string),
+            typeof(ImageThemeHelper), "#97a5ba");
     public static string GetLightColor(BindableObject view)
         => (string)view.GetValue(LightColorProperty);
-
     public static void SetLightColor(BindableObject view, string value)
         => view.SetValue(LightColorProperty, value);
 
-    // Color for Dark mode
     public static readonly BindableProperty DarkColorProperty =
-        BindableProperty.CreateAttached(
-            "DarkColor",
-            typeof(string),
-            typeof(ImageThemeHelper),
-            "#FFFFFF"); // Default white color
-
+        BindableProperty.CreateAttached("DarkColor", typeof(string),
+            typeof(ImageThemeHelper), "#FFFFFF");
     public static string GetDarkColor(BindableObject view)
         => (string)view.GetValue(DarkColorProperty);
-
     public static void SetDarkColor(BindableObject view, string value)
         => view.SetValue(DarkColorProperty, value);
 
-    private static readonly Dictionary<Image, EventHandler> _themeHandlers = new();
-    private static readonly Dictionary<Image, EventHandler<AppThemeChangedEventArgs>> _requestedThemeHandlers = new();
-    private static readonly Dictionary<Image, EventHandler> _handlerChangedHandlers = new();
+    // ── State ─────────────────────────────────────────────────────────────────
+    private sealed class ImageState
+    {
+        public EventHandler? ThemeHandler { get; set; }
+        public EventHandler<AppThemeChangedEventArgs>? RequestedHandler { get; set; }
+        public EventHandler? HandlerChangedHandler { get; set; }
+        public EventHandler? LoadedHandler { get; set; }
+        public bool IsSubscribed { get; set; }
+    }
 
+    private static readonly ConditionalWeakTable<Image, ImageState> _states = new();
+
+    // ── Entry point ───────────────────────────────────────────────────────────
     private static void OnUseThemeColorChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is not Image image) return;
-
-        CleanupHandlers(image);
-
-        if ((bool)newValue)
-        {
-            EventHandler handlerChanged = null;
-            handlerChanged = (s, e) =>
-            {
-                if (image.Handler != null)
-                {
-                    UpdateImageColor(image);
-                    image.HandlerChanged -= handlerChanged;
-                    _handlerChangedHandlers.Remove(image);
-                }
-            };
-
-            image.HandlerChanged += handlerChanged;
-            _handlerChangedHandlers[image] = handlerChanged;
-
-            if (image.Handler != null)
-            {
-                UpdateImageColor(image);
-                image.HandlerChanged -= handlerChanged;
-                _handlerChangedHandlers.Remove(image);
-            }
-
-            EventHandler themeHandler = (s, e) =>
-            {
-                if (image.Handler != null)
-                {
-                    UpdateImageColor(image);
-                }
-            };
-
-            EventHandler<AppThemeChangedEventArgs> requestedHandler = (s, e) =>
-            {
-                if (image.Handler != null)
-                {
-                    UpdateImageColor(image);
-                }
-            };
-
-            ThemeHelper.Instance.ThemeChanged += themeHandler;
-            Application.Current.RequestedThemeChanged += requestedHandler;
-
-            _themeHandlers[image] = themeHandler;
-            _requestedThemeHandlers[image] = requestedHandler;
-
-            image.Unloaded += OnImageUnloaded;
-        }
+        Unsubscribe(image);
+        if ((bool)newValue) Subscribe(image);
     }
 
-    private static void OnImageUnloaded(object sender, EventArgs e)
+    private static void Subscribe(Image image)
     {
-        if (sender is Image image)
-        {
-            CleanupHandlers(image);
-            image.Unloaded -= OnImageUnloaded;
-        }
-    }
+        var state = _states.GetOrCreateValue(image);
+        if (state.IsSubscribed) return;
 
-    private static void CleanupHandlers(Image image)
-    {
-        if (_themeHandlers.TryGetValue(image, out var themeHandler))
+        // 1) Handler tayyor bo'lganda rang ber (birinchi yuklash)
+        EventHandler? handlerChanged = null;
+        handlerChanged = (s, e) =>
         {
-            ThemeHelper.Instance.ThemeChanged -= themeHandler;
-            _themeHandlers.Remove(image);
-        }
+            if (image.Handler is null) return;
+            UpdateImageColor(image);
+            image.HandlerChanged -= state.HandlerChangedHandler;
+            state.HandlerChangedHandler = null;
+        };
+        state.HandlerChangedHandler = handlerChanged;
+        image.HandlerChanged += handlerChanged;
 
-        if (_requestedThemeHandlers.TryGetValue(image, out var requestedHandler))
+        if (image.Handler is not null)
         {
-            Application.Current.RequestedThemeChanged -= requestedHandler;
-            _requestedThemeHandlers.Remove(image);
-        }
-
-        if (_handlerChangedHandlers.TryGetValue(image, out var handlerChanged))
-        {
+            UpdateImageColor(image);
             image.HandlerChanged -= handlerChanged;
-            _handlerChangedHandlers.Remove(image);
+            state.HandlerChangedHandler = null;
         }
+
+        // 2) Navigation qaytganda — Loaded qayta chaqiriladi
+        //    HandlerChanging ishonchsiz, shuning uchun Loaded ishlatamiz
+        EventHandler? loadedHandler = null;
+        loadedHandler = (s, e) =>
+        {
+            // Handler hali attach bo'lmagan bo'lishi mumkin, post qilamiz
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (image.Handler is not null)
+                    UpdateImageColor(image);
+            });
+        };
+        state.LoadedHandler = loadedHandler;
+        image.Loaded += loadedHandler;
+
+        // 3) Theme o'zgarganda rang yangilansin
+        EventHandler themeHandler = (s, e) =>
+        {
+            if (image.Handler is null) return;
+            UpdateImageColor(image);
+        };
+        EventHandler<AppThemeChangedEventArgs> requestedHandler = (s, e) =>
+        {
+            if (image.Handler is null) return;
+            UpdateImageColor(image);
+        };
+
+        state.ThemeHandler = themeHandler;
+        state.RequestedHandler = requestedHandler;
+        state.IsSubscribed = true;
+
+        ThemeHelper.Instance.ThemeChanged += themeHandler;
+        Application.Current!.RequestedThemeChanged += requestedHandler;
+
+        image.Unloaded += OnImageUnloaded;
+    }
+
+    private static void Unsubscribe(Image image)
+    {
+        if (!_states.TryGetValue(image, out var state)) return;
+
+        if (state.ThemeHandler is not null)
+        {
+            ThemeHelper.Instance.ThemeChanged -= state.ThemeHandler;
+            state.ThemeHandler = null;
+        }
+
+        if (state.RequestedHandler is not null)
+        {
+            if (Application.Current is not null)
+                Application.Current.RequestedThemeChanged -= state.RequestedHandler;
+            state.RequestedHandler = null;
+        }
+
+        if (state.HandlerChangedHandler is not null)
+        {
+            image.HandlerChanged -= state.HandlerChangedHandler;
+            state.HandlerChangedHandler = null;
+        }
+
+        if (state.LoadedHandler is not null)
+        {
+            image.Loaded -= state.LoadedHandler;
+            state.LoadedHandler = null;
+        }
+
+        image.Unloaded -= OnImageUnloaded;
+        state.IsSubscribed = false;
+        _states.Remove(image);
+    }
+
+    private static void OnImageUnloaded(object? sender, EventArgs e)
+    {
+        // Unsubscribe emas — faqat Unloaded event'ni saqlab qo'yamiz
+        // Chunki Loaded qayta ishlashi kerak (navigation qaytganda)
+        // Faqat native handle tozalanadi, subscription qoladi
     }
 
     private static void UpdateImageColor(Image image)
     {
         try
         {
-            var theme = Application.Current.UserAppTheme;
-
+            var theme = Application.Current?.UserAppTheme ?? AppTheme.Unspecified;
             if (theme == AppTheme.Unspecified)
-            {
-                theme = Application.Current.RequestedTheme;
-            }
-
-            // Get the colors - if not given uses default values
-            var lightColorHex = GetLightColor(image);
-            var darkColorHex = GetDarkColor(image);
+                theme = Application.Current?.RequestedTheme ?? AppTheme.Light;
 
             var color = theme == AppTheme.Dark
-                ? Color.FromArgb(darkColorHex)
-                : Color.FromArgb(lightColorHex);
+                ? Color.FromArgb(GetDarkColor(image))
+                : Color.FromArgb(GetLightColor(image));
+
 #if ANDROID
             if (image.Handler?.PlatformView is Android.Widget.ImageView androidImage)
             {
@@ -163,16 +178,16 @@ public static class ImageThemeHelper
             }
 #elif IOS
             if (image.Handler?.PlatformView is UIKit.UIImageView iosImage)
-            { 
-                iosImage.Image = iosImage.Image?.ImageWithRenderingMode(
-                    UIKit.UIImageRenderingMode.AlwaysTemplate);
+            {
+                iosImage.Image = iosImage.Image?
+                    .ImageWithRenderingMode(UIKit.UIImageRenderingMode.AlwaysTemplate);
                 iosImage.TintColor = color.ToPlatform();
             }
 #endif
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Image color given error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[ImageThemeHelper] {ex.Message}");
         }
     }
 }

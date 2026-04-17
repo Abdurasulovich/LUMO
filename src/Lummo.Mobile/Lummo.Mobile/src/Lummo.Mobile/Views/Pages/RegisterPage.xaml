@@ -18,7 +18,7 @@
                 <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+        <ScrollView x:Name="MainScrollView" Grid.Row="1" VerticalScrollBarVisibility="Never">
             <Grid RowDefinitions="80,*">
                 <Grid Grid.Row="0" VerticalOptions="End">
                     <Border StrokeThickness="0"

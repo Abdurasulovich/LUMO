@@ -1,8 +1,6 @@
 ﻿using Lummo.Mobile.ApiClient.Models;
-
-namespace Lummo.Mobile.ApiClient.Interfaces;
-
-public interface ILummoApiClient
+[System.CodeDom.Compiler.GeneratedCode("NSwag", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial interface ILummoApiClient
 {
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -60,12 +58,30 @@ public interface ILummoApiClient
 
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<IdentityTokenDto> SignUpWithGoogleAsync(GoogleSignInRequest body);
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<IdentityTokenDto> SignUpWithGoogleAsync(GoogleSignInRequest body, System.Threading.CancellationToken cancellationToken);
+
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
     System.Threading.Tasks.Task<IdentityTokenDto> SignInAsync(SignInDetails body);
 
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
     System.Threading.Tasks.Task<IdentityTokenDto> SignInAsync(SignInDetails body, System.Threading.CancellationToken cancellationToken);
+
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<IdentityTokenDto> SignInWithGoogleAsync(GoogleSignInRequest body);
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<IdentityTokenDto> SignInWithGoogleAsync(GoogleSignInRequest body, System.Threading.CancellationToken cancellationToken);
 
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -87,12 +103,39 @@ public interface ILummoApiClient
 
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    System.Threading.Tasks.Task<bool> ResendVerificationCodeAsync(string body);
+    System.Threading.Tasks.Task<bool> ForgotPasswordVerifyEmailAsync(ForgotPasswordEmailVerificationDetails body);
 
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    System.Threading.Tasks.Task<bool> ResendVerificationCodeAsync(string body, System.Threading.CancellationToken cancellationToken);
+    System.Threading.Tasks.Task<bool> ForgotPasswordVerifyEmailAsync(ForgotPasswordEmailVerificationDetails body, System.Threading.CancellationToken cancellationToken);
+
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ForgotPasswordVerifyCodeAsync(EmailVerificationDetails body);
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ForgotPasswordVerifyCodeAsync(EmailVerificationDetails body, System.Threading.CancellationToken cancellationToken);
+
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ResetPasswordAsync(ResetPasswordDetails body);
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ResetPasswordAsync(ResetPasswordDetails body, System.Threading.CancellationToken cancellationToken);
+
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ResendVerificationCodeAsync(ResendVerificationCodeRequest body);
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>Success</returns>
+    /// <exception cref="ApiException">A server side error occurred.</exception>
+    System.Threading.Tasks.Task<bool> ResendVerificationCodeAsync(ResendVerificationCodeRequest body, System.Threading.CancellationToken cancellationToken);
 
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -120,5 +163,4 @@ public interface ILummoApiClient
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
     System.Threading.Tasks.Task EmailAsync(int? pageSize, int? pageToken, System.Threading.CancellationToken cancellationToken);
-
 }

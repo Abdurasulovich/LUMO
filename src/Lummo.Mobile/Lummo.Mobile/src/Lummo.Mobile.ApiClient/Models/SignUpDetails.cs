@@ -26,4 +26,7 @@ public partial class SignUpDetails
 
     [Newtonsoft.Json.JsonProperty("authProvider", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public AuthProvider AuthProvider { get; set; }
+
+    [Newtonsoft.Json.JsonProperty("googleIdToken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    public string GoogleIdToken { get; set; }
 }

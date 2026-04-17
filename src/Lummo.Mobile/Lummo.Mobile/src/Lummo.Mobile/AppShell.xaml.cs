@@ -9,6 +9,8 @@ namespace Lummo.Mobile
             InitializeComponent();
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(VerificationPage), typeof(VerificationPage));
+            Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
+            Routing.RegisterRoute(nameof(ResetPasswordPage), typeof(ResetPasswordPage));
         }
     }
 }

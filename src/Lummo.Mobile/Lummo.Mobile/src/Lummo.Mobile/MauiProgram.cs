@@ -16,6 +16,7 @@ using Xe.AcrylicView;
 using Lummo.Mobile.ViewModels;
 using Lummo.Mobile.Views.Pages;
 using Lummo.Mobile.Services.Identity.Implements;
+using Lummo.Mobile.Services.Interfaces;
 
 namespace Lummo.Mobile
 {
@@ -62,7 +63,7 @@ namespace Lummo.Mobile
             // HttpClient va API Client konfiguratsiyasi
             builder.Services.AddHttpClient("LummoApi", client =>
             {
-                client.BaseAddress = new Uri("http://192.168.88.134:5188/");
+                client.BaseAddress = new Uri("http://192.168.0.103:5188/");
                 client.Timeout = TimeSpan.FromSeconds(30);
             })
             .AddHttpMessageHandler<AuthHandler>();
@@ -72,15 +73,25 @@ namespace Lummo.Mobile
             {
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpClient = httpClientFactory.CreateClient("LummoApi");
-                return new LummoApiClient("http://192.168.88.134:5188/", httpClient);
+                return new LummoApiClient("http://192.168.0.103:5188/", httpClient);
             });
 
             // Boshqa servislar
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ILoadingService, LoadingService>();
 
             // ViewModels va Pages
             builder.Services.AddScoped<RegisterPageViewModel>();
+            builder.Services.AddScoped<VerificationPageViewModel>();
+            builder.Services.AddScoped<LoginPageViewModel>();
+            builder.Services.AddScoped<ForgotPasswordPageViewModel>();
+            builder.Services.AddScoped<ResetPasswordPageViewModel>();
+
+
             builder.Services.AddScoped<RegisterPage>();
+            builder.Services.AddScoped<VerificationPage>();
+            builder.Services.AddScoped<ForgotPasswordPage>();
+            builder.Services.AddScoped<ResetPasswordPage>();
 
 #if ANDROID
             builder.Services.AddSingleton<IAuthService, AuthService>();

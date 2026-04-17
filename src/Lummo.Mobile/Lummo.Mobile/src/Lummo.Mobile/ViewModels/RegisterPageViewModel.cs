@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lummo.Mobile.ApiClient.Exceptions;
-using Lummo.Mobile.ApiClient.Models;
+using Lummo.Mobile.Services.Enums;
 using Lummo.Mobile.Services.Identity.Interfaces;
+using Lummo.Mobile.Services.Interfaces;
 using Lummo.Mobile.Services.Models;
+using Lummo.Mobile.Views.Pages;
+using Mopups.Services;
 
 namespace Lummo.Mobile.ViewModels;
 
@@ -12,6 +15,7 @@ public partial class RegisterPageViewModel : ObservableObject
     #region Services
     private readonly IUserService _userService;
     private readonly IAuthService _authService;
+    private readonly ILoadingService _loadingService;
     #endregion
 
     #region Properies and fields
@@ -44,10 +48,13 @@ public partial class RegisterPageViewModel : ObservableObject
     [ObservableProperty]
     private int _isPasswordNotInputOrNotMatch = 0;
     public RegisterPageViewModel(IUserService userService,
-    IAuthService authService)
+    IAuthService authService,
+    ILoadingService loadingService)
     {
         _userService = userService;
         _authService = authService;
+        _loadingService = loadingService;
+
     }
 
     #region Commands
@@ -56,24 +63,17 @@ public partial class RegisterPageViewModel : ObservableObject
     {
         try
         {
-#if ANDROID
-            var result = await _authService.SignUpWithGoogleServiceAsync(default);
-
-            if (result is not null)
+            using (await _loadingService.Show())
             {
-                var signIn = await _authService.SignInAsync(new SignIn
-                {
-                    UsernameOrEmail = result.Email,
-                    Password = null,
-                    RememberMe = true
-                }, AuthProvider._1);
-                if (signIn)
+#if ANDROID
+                var result = await _authService.SignUpWithGoogleServiceAsync(default);
+                if (result)
                 {
                     // TODO: Asosiy sahifaga o'tish
-                    // await Shell.Current.GoToAsync("//MainPage");
+                    await Shell.Current.GoToAsync("//DashboardPage", false);
                 }
-            }
 #endif
+            }
         }
         catch (ApiException apiEx)
         {
@@ -96,9 +96,7 @@ public partial class RegisterPageViewModel : ObservableObject
         if (string.IsNullOrEmpty(UserName))
             IsUserNameNotInput = 1;
         if (string.IsNullOrEmpty(EmailAddress))
-        {
             IsEmailAdddressNotInputOrNotCorrect = 1;
-        }
         if (string.IsNullOrEmpty(Password))
         {
             IsPasswordNotInputOrNotMatch = 1;
@@ -117,34 +115,33 @@ public partial class RegisterPageViewModel : ObservableObject
 
         try
         {
-#if ANDROID
-            var signUpDetails = new SignUp
+            using (await _loadingService.Show())
             {
-                FirstName = this.FirstName,
-                LastName = this.LastName,
-                EmailAddress = this.EmailAddress,
-                Password = this.Password,
-                UserName = this.UserName,
-                AutoGeneratePassword = Password is not null ? false : true,
-            };
 
-            var signUpResult = await _authService.SignUpAsync(signUpDetails);
-            if (signUpResult is not null)
-            {
-                var signInDetails = new SignIn
+#if ANDROID
+                var signUpDetails = new SignUp
                 {
-                    UsernameOrEmail = signUpResult.UserName,
+                    FirstName = this.FirstName,
+                    LastName = this.LastName,
+                    EmailAddress = this.EmailAddress,
                     Password = this.Password,
-                    RememberMe = true
+                    UserName = this.UserName,
+                    AutoGeneratePassword = string.IsNullOrEmpty(this.Password),
                 };
-                var result = await _authService.SignInAsync(signInDetails, AuthProvider._0);
-                if (result)
+
+                var signUpResult = await _authService.SignUpAsync(signUpDetails);
+                if (signUpResult)
                 {
-                    // TODO: Asosiy sahifaga o'tish
-                    // await Shell.Current.GoToAsync("//Dashboard");
+                    var navigationParameter = new Dictionary<string, object>
+                {
+                    { "EmailAddress", this.EmailAddress},
+                    { "FlowType", VerificationFlow.Register }
+                };
+                    // TODO: Go to verification page
+                    await Shell.Current.GoToAsync(nameof(VerificationPage), navigationParameter);
                 }
-            }
 #endif
+            }
         }
         catch (ApiException apiEx)
         {

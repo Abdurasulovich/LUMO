@@ -1,9 +1,13 @@
 ﻿using Android.App;
 using Android.Gms.Auth.Api.SignIn;
+using Android.Gms.Common.Apis;
 using Lummo.Mobile.ApiClient.Interfaces;
 using Lummo.Mobile.ApiClient.Models;
 using Lummo.Mobile.Services.Identity.Interfaces;
+using Lummo.Mobile.Services.Interfaces;
 using Lummo.Mobile.Services.Models;
+using Lummo.Mobile.Views.Popups;
+using Mopups.Services;
 
 namespace Lummo.Mobile.Platforms.Android.Services;
 
@@ -21,7 +25,7 @@ public class AuthService : IAuthService
         _activity = Platform.CurrentActivity
             ?? throw new InvalidOperationException("Activity mavjud emas");
         var gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DefaultSignIn)
-            .RequestIdToken("608206764181-0h6b9m5h2jmtrof2u92olq73aaodcabh.apps.googleusercontent.com") // Google Cloud Console dan oling
+            .RequestIdToken("608206764181-f1bj129v2u0004uc3e7jhmrjobcpbis2.apps.googleusercontent.com") // Google Cloud Console dan oling
             .RequestEmail()
             .RequestId()
             .RequestProfile()
@@ -49,7 +53,7 @@ public class AuthService : IAuthService
                 GivenName = result.Account.GivenName ?? string.Empty,
                 FamilyName = result.Account.FamilyName ?? string.Empty,
                 IdToken = result.Account.IdToken ?? string.Empty,
-                PhotoUrl = result.Account.PhotoUrl?.ToString()
+                PhotoUrl = result.Account.PhotoUrl?.ToString(),
             };
 
             _authCompletionSource.TrySetResult(authResult);
@@ -67,21 +71,6 @@ public class AuthService : IAuthService
     public async Task<GoogleAuthResult> SignInWithGoogleAsync(CancellationToken cancellationToken = default)
     {
         // Avval mavjud hisobni tekshirish
-        var existingAccount = GoogleSignIn.GetLastSignedInAccount(_activity);
-        if (existingAccount != null)
-        {
-            return new GoogleAuthResult
-            {
-                IsSuccess = true,
-                Email = existingAccount.Email ?? string.Empty,
-                DisplayName = existingAccount.DisplayName ?? string.Empty,
-                GivenName = existingAccount.GivenName ?? string.Empty,
-                FamilyName = existingAccount.FamilyName ?? string.Empty,
-                IdToken = existingAccount.IdToken ?? string.Empty,
-                PhotoUrl = existingAccount.PhotoUrl?.ToString()
-            };
-        }
-
         _authCompletionSource = new TaskCompletionSource<GoogleAuthResult>();
 
         // Cancellation token bilan bog'lash
@@ -90,8 +79,8 @@ public class AuthService : IAuthService
             _authCompletionSource?.TrySetCanceled();
         });
 
+        await _googleSignInClient.SignOutAsync();
         _activity.StartActivityForResult(_googleSignInClient.SignInIntent, 9001);
-
         return await _authCompletionSource.Task;
     }
 
@@ -107,31 +96,48 @@ public class AuthService : IAuthService
 
     #region IAuthService implementation
 
-    public async Task<User> SignUpWithGoogleServiceAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> SignUpWithGoogleServiceAsync(CancellationToken cancellationToken = default)
     {
         var result = await SignInWithGoogleAsync(cancellationToken);
 
-        if (!result.IsSuccess)
-            throw new Exception(result.ErrorMessage);
+            if (!result.IsSuccess)
+                throw new Exception(result.ErrorMessage);
 
-        var payload = new SignUpDetails
-        {
-            FirstName = result.GivenName,
-            LastName = result.FamilyName,
-            EmailAddress = result.Email,
-            UserName = result.Email,
-            AutoGeneratePassword = true
-        };
+            // _apiClient.SignUpAsync returns IdentityTokenDto, not bool.
+            // Await the DTO and determine success by checking for a non-null instance and a non-empty AccessToken.
+            var idToken = new GoogleSignInRequest
+            {
+                GoogleIdToken = result.IdToken
+            };
+            var identityToken = await _apiClient.SignUpWithGoogleAsync(idToken, cancellationToken);
+            if (identityToken != null && !string.IsNullOrEmpty(identityToken.AccessToken))
+            {
+                var tokenInfo = new TokenInfo
+                {
+                    AccessToken = identityToken.AccessToken,
+                    RefreshToken = identityToken.RefreshToken,
+                    AccessTokenExpiresAt = identityToken.AccessTokenExpiryTime,
+                    RefreshTokenExpiresAt = identityToken.RefreshTokenExpiryTime
+                };
+                await _tokenResolver.ClearTokenAsync();
+                await _tokenResolver.SetTokenAsync(tokenInfo);
+                var userId = await _userService.GetUserIdFromAccessToken(tokenInfo.AccessToken);
+                if (userId is null)
+                    throw new InvalidOperationException("User ID not found in access token.");
 
-        await _apiClient.SignUpAsync(payload, cancellationToken);
-
-        return new User
-        {
-            FirstName = payload.FirstName,
-            LastName = payload.LastName,
-            Email = payload.EmailAddress,
-            UserName = payload.UserName
-        };
+                var user = await _apiClient.AccountsGETAsync(userId.Value, cancellationToken);
+                var userInfo = new User
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.EmailAddress,
+                    UserName = user.Username,
+                };
+                await _userService.AddUserAsync(userInfo);
+                return true;
+            }
+            return false;
     }
 
     public async Task<bool> SignInWithGoogleServiceAsync(CancellationToken cancellationToken = default)
@@ -141,13 +147,12 @@ public class AuthService : IAuthService
         if (!result.IsSuccess)
             throw new Exception(result.ErrorMessage);
 
-        var payload = new SignInDetails
+        var payload = new GoogleSignInRequest
         {
-            UsernameOrEmail = result.Email,
-            RememberMe = true
+            GoogleIdToken = result.IdToken
         };
 
-        var accessToken = await _apiClient.SignInAsync(payload, cancellationToken);
+        var accessToken = await _apiClient.SignInWithGoogleAsync(payload, cancellationToken);
         var tokenInfo = new TokenInfo
         {
             AccessToken = accessToken.AccessToken,
@@ -174,14 +179,15 @@ public class AuthService : IAuthService
 
         return true;
     }
-    public async ValueTask<bool> SignInAsync(SignIn signIn, AuthProvider authProvider, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> SignInAsync(SignIn signIn, CancellationToken cancellationToken = default)
     {
+
         var payload = new SignInDetails
         {
             UsernameOrEmail = signIn.UsernameOrEmail,
             Password = signIn.Password,
             RememberMe = signIn.RememberMe,
-            AuthProvider = authProvider
+            AuthProvider = AuthProvider.Email,
         };
 
         var accessToken = await _apiClient.SignInAsync(payload, cancellationToken);
@@ -201,6 +207,7 @@ public class AuthService : IAuthService
             throw new InvalidOperationException("User ID not found in access token.");
 
         var user = await _apiClient.AccountsGETAsync(userId.Value, cancellationToken);
+        await _userService.DeleteUserAsync();
         await _userService.AddUserAsync(new User
         {
             Id = user.Id,
@@ -213,29 +220,75 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public async ValueTask<User> SignUpAsync(SignUp signUp, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> SignUpAsync(SignUp signUp, CancellationToken cancellationToken = default)
     {
         var payload = new SignUpDetails
         {
             FirstName = signUp.FirstName,
             LastName = signUp.LastName,
             UserName = signUp.UserName ?? signUp.EmailAddress.Split('@')[0],
-            AuthProvider = AuthProvider._1,
+            AuthProvider = AuthProvider.Email,
             EmailAddress = signUp.EmailAddress,
-            Password = signUp.Password,
-            AutoGeneratePassword = signUp.Password is null,
+            Password = signUp.Password ?? string.Empty,
+            AutoGeneratePassword = string.IsNullOrEmpty(signUp.Password),
             Age = signUp.Age,
+            GoogleIdToken = string.Empty
         };
 
-        await _apiClient.SignUpAsync(payload, cancellationToken);
+        return await _apiClient.SignUpAsync(payload, cancellationToken);
+    }
 
-        return new User
+    public async ValueTask<bool> VerifyEmail(EmailVerificationDetails emailVerificationDetails, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            FirstName = payload.FirstName,
-            LastName = payload.LastName,
-            UserName = payload.UserName,
-            Email = payload.EmailAddress
-        };
+            await _apiClient.VerifyEmailAsync(new EmailVerificationDetails
+            {
+                EmailAddress = emailVerificationDetails.EmailAddress,
+                VerificationCode = emailVerificationDetails.VerificationCode
+            }, cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public ValueTask<bool> ResendVerificationCode(ResendVerificationCodeRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return new ValueTask<bool>(_apiClient.ResendVerificationCodeAsync(new ResendVerificationCodeRequest
+            {
+                EmailAddress = request.EmailAddress
+            }, cancellationToken));
+        }
+        catch (Exception ex)
+        {
+            return new ValueTask<bool>(false);
+        }
+    }
+
+    public async ValueTask<bool> ForgotPasswordVerifyEmailAsync(ForgotPasswordEmailVerificationDetails emailVerificationDetails, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _apiClient.ForgotPasswordVerifyEmailAsync(new ForgotPasswordEmailVerificationDetails
+            {
+                EmailAddress = emailVerificationDetails.EmailAddress
+            }, cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public ValueTask<bool> ResetPasswordAsync(ResetPasswordDetails resetPasswordDetails, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 }
-#endregion
+    #endregion

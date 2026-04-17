@@ -9,6 +9,7 @@ using gr = Android.Graphics;
 namespace Lummo.Mobile.Platforms.Android
 {
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true,
+        WindowSoftInputMode = SoftInput.AdjustResize,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |
                                ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
@@ -20,6 +21,13 @@ namespace Lummo.Mobile.Platforms.Android
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            // Keyboard chiqqanda root view'ni yuqoriga ko'tarish
+            var rootView = Window?.DecorView.FindViewById(global::Android.Resource.Id.Content);
+            if (rootView != null)
+            {
+                ViewCompat.SetOnApplyWindowInsetsListener(rootView, new KeyboardInsetsListener());
+            }
 
             // Edge-to-edge rejimi
             WindowCompat.SetDecorFitsSystemWindows(Window, false);

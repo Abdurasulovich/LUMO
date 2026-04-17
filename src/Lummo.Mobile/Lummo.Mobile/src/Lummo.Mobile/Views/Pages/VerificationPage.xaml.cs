@@ -1,3 +1,4 @@
+using Lummo.Mobile.ViewModels;
 using Lummo.Mobile.Views.Frames;
 using Lummo.Mobile.Views.Popups;
 using Mopups.Services;
@@ -9,12 +10,14 @@ public partial class VerificationPage : ContentPage
     private VerificationInput[] _inputs = null!;
     private IDispatcherTimer _timer = null!;
     private int _remainingSeconds = 60;
+    private VerificationPageViewModel _viewModel;
 
-    public VerificationPage()
+    public VerificationPage(VerificationPageViewModel viewModel)
     {
         InitializeComponent();
         SetupInputs();
         StartCountdown();
+        _viewModel = viewModel;
     }
 
     private void SetupInputs()
@@ -70,7 +73,7 @@ public partial class VerificationPage : ContentPage
     private async void ResendCode_Handler(object sender, TappedEventArgs e)
     {
         // TODO: Backend ga yangi kod so'rovi yuborish
-        // await _verificationService.ResendCodeAsync();
+        await _viewModel.ResendCode();
 
         ShowTimer();
         StartCountdown();
@@ -117,7 +120,13 @@ public partial class VerificationPage : ContentPage
 
     private async void VerifyCode_Handler(object sender, TappedEventArgs e)
     {
-        await MopupService.Instance.PushAsync(new LoadingPopup());
+        var code = GetVerificationCode();
+
+        if (code.Length < 6)
+        {
+            return;
+        }
+        await _viewModel.VerifyCode(code);
     }
 
     protected override void OnDisappearing()

@@ -4,6 +4,7 @@ namespace Lummo.Mobile.Services.Models;
 
 public class User
 {
+    [PrimaryKey]
     public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

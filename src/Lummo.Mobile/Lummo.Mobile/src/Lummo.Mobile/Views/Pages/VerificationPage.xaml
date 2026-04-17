@@ -6,169 +6,173 @@
              xmlns:vrfInputs="clr-namespace:Lummo.Mobile.Views.Frames"
              xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Shell.NavBarIsVisible="False">
-    
-    <Grid RowDefinitions="80,*,Auto,Auto,Auto,1.5*, Auto">
-        <Grid.Background>
-            <LinearGradientBrush  EndPoint="0,1">
-                <GradientStop Color="{AppThemeBinding Light=#e4dcfc, Dark=#231942}" Offset="0"/>
-                <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <Grid Grid.Row="0" VerticalOptions="End">
-            <Border StrokeThickness="0"
+    <Grid>
+        <ScrollView>
+            <Grid RowDefinitions="80,*,Auto,Auto,Auto,1.5*, Auto">
+
+                <Grid.Background>
+                    <LinearGradientBrush  EndPoint="0,1">
+                        <GradientStop Color="{AppThemeBinding Light=#e4dcfc, Dark=#231942}" Offset="0"/>
+                        <GradientStop Color="{AppThemeBinding Light=#f5f2fe, Dark=#2d185a}" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Grid Grid.Row="0" VerticalOptions="End">
+                    <Border StrokeThickness="0"
             StrokeShape="Rectangle 20"
             HeightRequest="50"
             WidthRequest="50"
             Padding="15"
             VerticalOptions="Center"
             HorizontalOptions="Start">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="GoToRegisterPage_Handler"/>
-                </Border.GestureRecognizers>
-                <Image Source="arrow.png"
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="GoToRegisterPage_Handler"/>
+                        </Border.GestureRecognizers>
+                        <Image Source="arrow.png"
                 Aspect="AspectFit"
                 imgUiHelper:ImageThemeHelper.UseThemeColor="True"
                 imgUiHelper:ImageThemeHelper.LightColor="#000000"
                 imgUiHelper:ImageThemeHelper.DarkColor="#ffffff"/>
-            </Border>
+                    </Border>
 
-            <Label Grid.Column="1"
+                    <Label Grid.Column="1"
                 HorizontalTextAlignment="Center"
                 VerticalTextAlignment="Center"
                 Text="Verification"
                 FontSize="22"
                 FontFamily="PoppinsMedium"
                 FontAttributes="Bold"/>
-        </Grid>
+                </Grid>
 
-        <Border Grid.Row="1"
+                <Border Grid.Row="1"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 60"
                 HeightRequest="120"
                 WidthRequest="120"
                 Background="{AppThemeBinding Light=#114913EC, Dark=#444913EC}"
                 Padding="35">
-            <Image Source="envelope"
+                    <Image Source="envelope"
                    Aspect="AspectFit"
                    imgUiHelper:ImageThemeHelper.UseThemeColor="True"
                    imgUiHelper:ImageThemeHelper.LightColor="#4913EC"
                    imgUiHelper:ImageThemeHelper.DarkColor="#4913EC"/>
-        </Border>
+                </Border>
 
-        <VerticalStackLayout Grid.Row="2" Spacing="5" Padding="40,0"
+                <VerticalStackLayout Grid.Row="2" Spacing="5" Padding="40,0"
                              VerticalOptions="Start">
-            <Label Text="Verify Your Email"
+                    <Label Text="Verify Your Email"
                    FontAttributes="Bold"
                    FontFamily="PoppinsBold"
                    FontSize="30"
                    HorizontalTextAlignment="Center"/>
 
-            <Label Text="Enter the 6-digit code sent to your email. Check your spam folder if you don't see it."
+                    <Label Text="Enter the 6-digit code sent to your email. Check your spam folder if you don't see it."
                    FontFamily="PoppinsMedium"
                    FontSize="16"
                    HorizontalTextAlignment="Center"
                    TextColor="#64748b"/>
-        </VerticalStackLayout>
+                </VerticalStackLayout>
 
-        <HorizontalStackLayout Grid.Row="3" Spacing="10" 
+                <HorizontalStackLayout Grid.Row="3" Spacing="10" 
                                HorizontalOptions="Center"
                                Margin="20,40,20,0">
-            <vrfInputs:VerificationInput x:Name="firstInput"/>
-            <vrfInputs:VerificationInput x:Name="secondInput"/>
-            <vrfInputs:VerificationInput x:Name="thirdInput"/>
-            <vrfInputs:VerificationInput x:Name="fourthInput"/>
-            <vrfInputs:VerificationInput x:Name="fifthInput"/>
-            <vrfInputs:VerificationInput x:Name="sixthInput"/>
-        </HorizontalStackLayout>
+                    <vrfInputs:VerificationInput x:Name="firstInput"/>
+                    <vrfInputs:VerificationInput x:Name="secondInput"/>
+                    <vrfInputs:VerificationInput x:Name="thirdInput"/>
+                    <vrfInputs:VerificationInput x:Name="fourthInput"/>
+                    <vrfInputs:VerificationInput x:Name="fifthInput"/>
+                    <vrfInputs:VerificationInput x:Name="sixthInput"/>
+                </HorizontalStackLayout>
 
-        <Border Grid.Row="4" 
+                <Border Grid.Row="4" 
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 25"
                 Background="#4a14ec"
                 Padding="20,15"
                 Margin="20,50,20,0"
                 VerticalOptions="Center">
-            <Border.GestureRecognizers>
-                <TapGestureRecognizer Tapped="VerifyCode_Handler"/>
-            </Border.GestureRecognizers>
-            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="5"
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="VerifyCode_Handler"/>
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="5"
                   HorizontalOptions="Center">
-                <Label Text="Verify"
+                        <Label Text="Verify"
                        FontSize="18"
                        FontFamily="PoppinsBold"
                        Grid.Column="0"
                        VerticalOptions="Center"
                        TextColor="White"
                        HorizontalTextAlignment="Center"/>
-                <Image Grid.Column="1"
+                        <Image Grid.Column="1"
                        Source="arrow_right"
                        HeightRequest="20"
                        VerticalOptions="Center"
                        imgUiHelper:ImageThemeHelper.UseThemeColor="True"
                        imgUiHelper:ImageThemeHelper.LightColor="#fff"
                        imgUiHelper:ImageThemeHelper.DarkColor="#fff"/>
-            </Grid>
-        </Border>
+                    </Grid>
+                </Border>
 
-        <VerticalStackLayout Grid.Row="6" Spacing="10"
+                <VerticalStackLayout Grid.Row="6" Spacing="10"
                              Margin="0,0,0,50">
-            <Label Text="Didn't receive the code?"
+                    <Label Text="Didn't receive the code?"
                    FontFamily="PoppinsMedium"
                    TextColor="#64748b"
                    HorizontalTextAlignment="Center"/>
 
-            <!-- Timer state -->
-            <HorizontalStackLayout x:Name="TimerSection"
+                    <!-- Timer state -->
+                    <HorizontalStackLayout x:Name="TimerSection"
                                    Spacing="5"
                                    HorizontalOptions="Center">
-                <Label Text="Resend Code in"
+                        <Label Text="Resend Code in"
                        FontFamily="PoppinsMedium"
                        TextColor="#94A3B8"
                        VerticalOptions="Center"
                        HorizontalTextAlignment="Center"/>
-                <Border StrokeThickness="0"
+                        <Border StrokeThickness="0"
                         StrokeShape="RoundRectangle 8"
                         Background="{AppThemeBinding Light=#114a14ec, Dark=#444a14ec}"
                         Padding="10,3">
-                    <Label>
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span x:Name="MinutesSpan"
+                            <Label>
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span x:Name="MinutesSpan"
                                       Text="01"
                                       FontFamily="PoppinsBold"
                                       TextColor="#4a14ec"
                                       FontSize="16"/>
-                                <Span Text=" : "
+                                        <Span Text=" : "
                                       FontFamily="PoppinsBold"
                                       TextColor="#4a14ec"
                                       FontSize="16"/>
-                                <Span x:Name="SecondsSpan"
+                                        <Span x:Name="SecondsSpan"
                                       Text="00"
                                       FontFamily="PoppinsBold"
                                       TextColor="#4a14ec"
                                       FontSize="16"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                </Border>
-            </HorizontalStackLayout>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Border>
+                    </HorizontalStackLayout>
 
-            <!-- Resend button -->
-            <Border x:Name="ResendButton"
+                    <!-- Resend button -->
+                    <Border x:Name="ResendButton"
                     IsVisible="False"
                     StrokeThickness="0"
                     StrokeShape="RoundRectangle 12"
                     Background="Transparent"
                     Padding="20,10"
                     HorizontalOptions="Center">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="ResendCode_Handler"/>
-                </Border.GestureRecognizers>
-                <Label Text="Resend Code"
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ResendCode_Handler"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Resend Code"
                        FontFamily="PoppinsBold"
                        FontSize="14"
                        TextColor="#4a14ec"/>
-            </Border>
-        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
     </Grid>
 </ContentPage>

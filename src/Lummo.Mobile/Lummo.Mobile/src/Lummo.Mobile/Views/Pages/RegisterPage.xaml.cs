@@ -14,6 +14,27 @@ public partial class RegisterPage : ContentPage
         InitializeComponent();
         this.BindingContext = _viewModel = vm;
 	}
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+#if ANDROID
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?
+            .Window?.SetSoftInputMode(
+                Android.Views.SoftInput.AdjustResize);
+#endif
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+#if ANDROID
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?
+            .Window?.SetSoftInputMode(
+                Android.Views.SoftInput.AdjustPan);
+#endif
+    }
 
     private async void ReEnterEyeButtonClicked(object sender, EventArgs e)
     {
